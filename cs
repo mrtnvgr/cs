@@ -9,7 +9,7 @@ class Main:
 
     def getargs(self):
         parser = argparse.ArgumentParser("cs")
-        parser.add_argument("cmd", type=str, choices=("set","") )
+        parser.add_argument("cmd", type=str, choices=("set","convert","conv") )
         parser.add_argument("name", type=str)
         self.args = parser.parse_args()
 
@@ -30,6 +30,8 @@ class Main:
             self.generateTemplates()
             self.updaters()
             self.genStatus()
+        elif self.args.cmd in ("convert","conv"):
+            self.convertColorscheme()
 
     def getColorscheme(self):
         paths = []
@@ -63,6 +65,25 @@ class Main:
             template = open(os.path.join(self.path_me, "templates", "optional", "colors.termux")).read()
             open(path, "w").write(template.format(**self.scheme))
             #TODO: reload termux
+
+    def convertColorscheme(self):
+        if os.path.exists(self.args.name):
+            text = open(self.args.name).read()
+            if text[0]=="{":
+                self.scheme = {}
+                text = json.loads(text)
+                if "colors" in text and "special" in text:
+                    for pack in ("special","colors"):
+                        for color in text[pack]:
+                            self.scheme[color] = text[pack][color]
+                    self.saveColorscheme()
+        else:
+            print(f"File {self.args.name} doesnt exist")
+
+    def saveColorscheme(self):
+        path = os.path.join(self.path_config, "colorschemes", self.args.name)
+        json.dump(self.scheme, open(path, "w"))
+        print(f"Saved to {path}")
 
     def updaters(self):
         self.updatexrdb()
