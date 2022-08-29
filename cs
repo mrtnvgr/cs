@@ -12,7 +12,9 @@ class Main:
         parser = argparse.ArgumentParser("cs")
         parser.add_argument("cmd", type=str, choices=("set",
                                                       "convert",
-                                                      "conv") )
+                                                      "conv",
+                                                      "delete",
+                                                      "del") )
         parser.add_argument("name", type=str)
         self.args = parser.parse_args()
 
@@ -21,10 +23,18 @@ class Main:
         self.path_home = os.getenv("HOME")
         self.path_config = os.path.join(self.path_home, ".config", "cs")
         self.path_cache = os.path.join(self.path_home, ".cache", "cs")
+        self.path_colorschemes = (
+                os.path.join(self.path_config, "colorschemes"),
+                os.path.join(self.path_me, "colorschemes"))
         for folder in (self.path_home,
                        self.path_config,
-                       self.path_cache):
-            os.makedirs(folder, exist_ok=True)
+                       self.path_cache,
+                       self.path_colorschemes):
+            if type(folder)==str:
+                os.makedirs(folder, exist_ok=True)
+            else:
+                for fol in folder:
+                    os.makedirs(fol, exist_ok=True)
 
     def cmds(self):
         if self.args.cmd=="set":
@@ -39,12 +49,11 @@ class Main:
             self.currentScheme()
         elif self.args.cmd in ("convert","conv"):
             self.convertColorscheme()
+        elif self.args.cmd in ("delete","del"):
+            self.deleteColorscheme()
 
     def getColorscheme(self):
-        paths = []
-        paths.append(os.path.join(self.path_config, "colorschemes"))
-        paths.append(os.path.join(self.path_me, "colorschemes"))
-        for path in paths:
+        for path in self.path_colorschemes:
             path = os.path.join(path, f"{self.args.name}.json")
             if os.path.exists(path):
                 return json.load(open(path))
@@ -94,6 +103,14 @@ class Main:
                             self.args.name)
         json.dump(self.scheme, open(path, "w"))
         print(f"[{self.paint(3, '*')}] Colorscheme saved to {path}")
+
+    def deleteColorscheme(self):
+        for folder in self.path_colorschemes:
+            path = os.path.join(folder, f"{self.args.name}.json")
+            if os.path.exists(path):
+                ch = input(f"[{self.paint(3, '!')}] delete: {path} (y/n): ").lower()
+                if ch=="y":
+                    os.remove(path)
 
     def updaters(self):
         self.updateTermux()
