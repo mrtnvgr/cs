@@ -1,0 +1,91 @@
+#!/bin/python
+import argparse, subprocess, json, os
+
+class Main:
+    def __init__(self):
+        self.getargs()
+        self.setpaths()
+        self.cmds()
+
+    def getargs(self):
+        parser = argparse.ArgumentParser("cs")
+        parser.add_argument("cmd", type=str, choices=("set","") )
+        parser.add_argument("name", type=str)
+        self.args = parser.parse_args()
+
+    def setpaths(self):
+        self.path_me = os.path.dirname(os.path.realpath(__file__))
+        self.path_home = os.getenv("HOME")
+        self.path_config = os.path.join(self.path_home, ".config", "cs")
+        self.path_cache = os.path.join(self.path_home, ".cache", "cs")
+        for folder in (self.path_home,
+                       self.path_config,
+                       self.path_cache):
+            os.makedirs(folder, exist_ok=True)
+
+    def cmds(self):
+        if self.args.cmd=="set":
+            self.scheme = self.getColorscheme()
+            self.getFullColorScheme()
+            self.generateTemplates()
+            self.updaters()
+            self.genStatus()
+
+    def getColorscheme(self):
+        paths = []
+        paths.append(os.path.join(self.path_config, "colorschemes"))
+        paths.append(os.path.join(self.path_me, "colorschemes"))
+        for path in paths:
+            path = os.path.join(path, f"{self.args.name}.json")
+            if os.path.exists(path):
+                return json.load(open(path))
+        print(f"Unknown colorscheme: {self.args.name}")
+        exit(1)
+
+    def getFullColorScheme(self):
+        for color in self.scheme.copy():
+            self.scheme[f"{color}_strip"] = self.scheme[color][1:]
+
+    def generateTemplates(self):
+        path = os.path.join(self.path_me, "templates")
+        for file in os.listdir(path):
+            path = os.path.join(path, file)
+            if os.path.isfile(path):
+                template = open(path).read()
+                template = template.format(**self.scheme)
+                open(os.path.join(self.path_cache, file), "w").write(template)
+        self.generateOptionalTemplates()
+
+    def generateOptionalTemplates(self):
+        path = os.path.join(self.path_home, ".termux")
+        if os.path.exists(path):
+            path = os.path.join(path, "colors.properties")
+            template = open(os.path.join(self.path_me, "templates", "optional", "colors.termux")).read()
+            open(path, "w").write(template.format(**self.scheme))
+            #TODO: reload termux
+
+    def updaters(self):
+        self.updatexrdb()
+        self.updatetty()
+
+    def updatexrdb(self):
+        path = os.path.join(os.getenv("HOME"), ".cache", "cs", "colors.Xresources")
+        subprocess.run(["xrdb", "-merge", "-quiet", path], check=False)
+
+    def updatetty(self):
+        path = os.path.join(os.getenv("HOME"), ".cache", "cs", "colors.sh")
+        term = os.getenv("TERM")
+        if term=="linux":
+            subprocess.run(["sh", path])
+        
+    def genStatus(self):
+        path = os.path.join(os.getenv("HOME"), ".cache", "cs", "status.json")
+        status = {"colorscheme": {"name": self.args.name}}
+        json.dump(status, open(path,"w"))
+
+    @staticmethod
+    def strip(color):
+        return color[1:]
+
+if __name__=="__main__":
+    Main()
