@@ -1,5 +1,6 @@
 #!/bin/python
-import argparse, subprocess, json, os
+import argparse, subprocess, \
+       shutil, json, os
 
 class Main:
     def __init__(self):
@@ -9,7 +10,9 @@ class Main:
 
     def getargs(self):
         parser = argparse.ArgumentParser("cs")
-        parser.add_argument("cmd", type=str, choices=("set","convert","conv") )
+        parser.add_argument("cmd", type=str, choices=("set",
+                                                      "convert",
+                                                      "conv") )
         parser.add_argument("name", type=str)
         self.args = parser.parse_args()
 
@@ -30,6 +33,7 @@ class Main:
             self.generateTemplates()
             self.updaters()
             self.genStatus()
+            self.currentScheme()
         elif self.args.cmd in ("convert","conv"):
             self.convertColorscheme()
 
@@ -62,7 +66,9 @@ class Main:
         path = os.path.join(self.path_home, ".termux")
         if os.path.exists(path):
             path = os.path.join(path, "colors.properties")
-            template = open(os.path.join(self.path_me, "templates", "optional", "colors.termux")).read()
+            template = open(os.path.join(self.path_me, "templates",
+                                         "optional",
+                                         "colors.termux")).read()
             open(path, "w").write(template.format(**self.scheme))
             subprocess.run(["termux-reload-settings"])
 
@@ -81,7 +87,8 @@ class Main:
             print(f"File {self.args.name} doesnt exist")
 
     def saveColorscheme(self):
-        path = os.path.join(self.path_config, "colorschemes", self.args.name)
+        path = os.path.join(self.path_config, "colorschemes",
+                            self.args.name)
         json.dump(self.scheme, open(path, "w"))
         print(f"Saved to {path}")
 
@@ -90,19 +97,37 @@ class Main:
         self.updatetty()
 
     def updatexrdb(self):
-        path = os.path.join(os.getenv("HOME"), ".cache", "cs", "colors.Xresources")
-        subprocess.run(["xrdb", "-merge", "-quiet", path], check=False)
+        path = os.path.join(os.getenv("HOME"), ".cache",
+                            "cs", "colors.Xresources")
+        if shutil.which("xrdb"):
+            subprocess.run(["xrdb", "-merge", "-quiet", path],
+                            check=False)
 
     def updatetty(self):
-        path = os.path.join(os.getenv("HOME"), ".cache", "cs", "colors.sh")
+        path = os.path.join(os.getenv("HOME"), ".cache",
+                            "cs", "colors.sh")
         term = os.getenv("TERM")
         if term=="linux":
             subprocess.run(["sh", path])
         
     def genStatus(self):
-        path = os.path.join(os.getenv("HOME"), ".cache", "cs", "status.json")
+        path = os.path.join(os.getenv("HOME"), ".cache",
+                            "cs", "status.json")
         status = {"colorscheme": {"name": self.args.name}}
         json.dump(status, open(path,"w"))
+
+    def currentScheme(self):
+        print(f"Current colorscheme: {self.args.name.title()}")
+        self.colorPalette()
+
+    def colorPalette(self):
+        for i in range(0, 16):
+            if i % 8 == 0:
+                print()
+            if i > 7:
+                i = "8;5;%s" % i
+            print("\033[4%sm%s\033[0m" % (i, " " * (80 // 20)), end="")
+        print("\n")
 
     @staticmethod
     def strip(color):
