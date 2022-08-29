@@ -1,6 +1,10 @@
 #!/bin/python
-import argparse, subprocess, \
-       shutil, json, os
+import subprocess, shutil, \
+       json, os, sys
+
+class Namespace:
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
 
 class Main:
     def __init__(self):
@@ -9,15 +13,14 @@ class Main:
         self.cmds()
 
     def getargs(self):
-        parser = argparse.ArgumentParser("cs")
-        parser.add_argument("cmd", type=str, choices=("set",
-                                                      "convert",
-                                                      "conv",
-                                                      "delete",
-                                                      "del",
-                                                      "list") )
-        parser.add_argument("name", type=str)
-        self.args = parser.parse_args()
+        args = sys.argv
+        if len(args)==1:
+            self.help()
+        elif len(args)==2:
+            name = None
+        else:
+            name = args[2]
+        self.args = Namespace(cmd=args[1], name=name)
 
     def setpaths(self):
         self.path_me = os.path.dirname(os.path.realpath(__file__))
@@ -54,6 +57,8 @@ class Main:
             self.deleteColorscheme()
         elif self.args.cmd == "list":
             self.listColorschemes()
+        elif self.args.cmd == "help":
+            self.help()
 
     def getColorscheme(self):
         for path in self.path_colorschemes:
@@ -157,7 +162,8 @@ class Main:
         json.dump(status, open(path,"w"))
 
     def currentScheme(self):
-        print(f"[{self.paint(2, '*')}] Current colorscheme: {self.args.name.title()}")
+        print(f"[{self.paint(2, '*')}] Current colorscheme: \
+                {self.beautify(self.args.name)}")
         self.colorPalette()
 
     def colorPalette(self):
@@ -168,6 +174,16 @@ class Main:
                 i = "8;5;%s" % i
             print("\033[4%sm%s\033[0m" % (i, " " * (80 // 20)), end="")
         print("\n")
+
+    def help(self):
+        print("cs {mode} {name}")
+        print(" Modes:")
+        print("  set - set colorscheme")
+        print("  del (delete) - delete colorscheme")
+        print("  conv (convert) - convert colorscheme from other formats")
+        print("  list - print colorschemes")
+        print("  help - print help")
+        exit(0)
 
     @staticmethod
     def paint(color, text, bold=1):
