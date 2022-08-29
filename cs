@@ -45,18 +45,15 @@ class Main:
             self.listColorschemes()
         elif self.args.cmd == "help":
             self.help()
+        elif self.args.cmd in ("reload", "rel"):
+            path = os.path.join(self.path_cache, "status.json")
+            if os.path.exists(path):
+                self.args.name = json.load(open(path))["colorscheme"]["name"]
+                self.setColorscheme()
         else:
             if self.args.name!=None:
                 if self.args.cmd=="set":
-                    print(f"[{self.paint(2, '*')}] Getting colorscheme...")
-                    self.scheme = self.getColorscheme()
-                    self.getFullColorScheme()
-                    print(f"[{self.paint(2, '*')}] Generating templates...")
-                    self.generateTemplates()
-                    print(f"[{self.paint(2, '*')}] Updating colors...")
-                    self.updaters()
-                    self.genStatus()
-                    self.currentScheme()
+                    self.setColorscheme()  
                 elif self.args.cmd in ("convert","conv"):
                     self.convertColorscheme()
                 elif self.args.cmd in ("delete","del"):
@@ -65,7 +62,16 @@ class Main:
                 print(f"[{self.paint(1, 'x')}] error: Unknown command or invalid usage")
                 exit(1)
 
+    def setColorscheme(self):
+        self.scheme = self.getColorscheme()
+        self.getFullColorScheme()
+        self.generateTemplates()
+        self.updaters()
+        self.genStatus()
+        self.currentScheme()
+
     def getColorscheme(self):
+        print(f"[{self.paint(2, '*')}] Getting colorscheme...")
         for path in self.path_colorschemes:
             path = os.path.join(path, f"{self.args.name}.json")
             if os.path.exists(path):
@@ -78,6 +84,7 @@ class Main:
             self.scheme[f"{color}_strip"] = self.scheme[color][1:]
 
     def generateTemplates(self):
+        print(f"[{self.paint(2, '*')}] Generating templates...")
         path = os.path.join(self.path_me, "templates")
         for file in os.listdir(path):
             path = os.path.join(path, file)
@@ -133,6 +140,7 @@ class Main:
                     print(f"    - {self.beautify(file)}")
 
     def updaters(self):
+        print(f"[{self.paint(2, '*')}] Updating colors...")
         self.updateTermux()
         self.updatexrdb()
         self.updatetty()
@@ -185,6 +193,7 @@ class Main:
         print("        set - set colorscheme")
         print("        del (delete) - delete colorscheme")
         print("        conv (convert) - convert colorscheme from other formats")
+        print("        rel (reload) - reload templates")
         print("        list - print colorschemes")
         print("        help - print help")
         exit(0)
