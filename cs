@@ -41,31 +41,36 @@ class Main:
                     os.makedirs(fol, exist_ok=True)
 
     def cmds(self):
-        if self.args.cmd=="set":
-            print(f"[{self.paint(2, '*')}] Getting colorscheme...")
-            self.scheme = self.getColorscheme()
-            self.getFullColorScheme()
-            print(f"[{self.paint(2, '*')}] Generating templates...")
-            self.generateTemplates()
-            print(f"[{self.paint(2, '*')}] Updating colors...")
-            self.updaters()
-            self.genStatus()
-            self.currentScheme()
-        elif self.args.cmd in ("convert","conv"):
-            self.convertColorscheme()
-        elif self.args.cmd in ("delete","del"):
-            self.deleteColorscheme()
-        elif self.args.cmd == "list":
+        if self.args.cmd == "list":
             self.listColorschemes()
         elif self.args.cmd == "help":
             self.help()
+        else:
+            if self.args.name!=None:
+                if self.args.cmd=="set":
+                    print(f"[{self.paint(2, '*')}] Getting colorscheme...")
+                    self.scheme = self.getColorscheme()
+                    self.getFullColorScheme()
+                    print(f"[{self.paint(2, '*')}] Generating templates...")
+                    self.generateTemplates()
+                    print(f"[{self.paint(2, '*')}] Updating colors...")
+                    self.updaters()
+                    self.genStatus()
+                    self.currentScheme()
+                elif self.args.cmd in ("convert","conv"):
+                    self.convertColorscheme()
+                elif self.args.cmd in ("delete","del"):
+                    self.deleteColorscheme()
+            else:
+                print(f"[{self.paint(1, 'x')}] error: Unknown command or invalid usage")
+                exit(1)
 
     def getColorscheme(self):
         for path in self.path_colorschemes:
             path = os.path.join(path, f"{self.args.name}.json")
             if os.path.exists(path):
                 return json.load(open(path))
-        print(f"[{self.paint(1, 'x')}] Unknown colorscheme: {self.args.name}")
+        print(f"[{self.paint(1, 'x')}] error: Unknown colorscheme: {self.args.name}")
         exit(1)
 
     def getFullColorScheme(self):
@@ -104,7 +109,7 @@ class Main:
                             self.scheme[color] = text[pack][color]
                     self.saveColorscheme()
         else:
-            print(f"[{self.paint(1, 'x')}] File {self.args.name} doesnt exist")
+            print(f"[{self.paint(1, 'x')}] error: File {self.args.name} doesnt exist")
 
     def saveColorscheme(self):
         path = os.path.join(self.path_config, "colorschemes",
@@ -162,8 +167,7 @@ class Main:
         json.dump(status, open(path,"w"))
 
     def currentScheme(self):
-        print(f"[{self.paint(2, '*')}] Current colorscheme: \
-                {self.beautify(self.args.name)}")
+        print(f"[{self.paint(2, '*')}] Current colorscheme: {self.beautify(self.args.name)}")
         self.colorPalette()
 
     def colorPalette(self):
@@ -177,12 +181,12 @@ class Main:
 
     def help(self):
         print("cs {mode} {name}")
-        print(" Modes:")
-        print("  set - set colorscheme")
-        print("  del (delete) - delete colorscheme")
-        print("  conv (convert) - convert colorscheme from other formats")
-        print("  list - print colorschemes")
-        print("  help - print help")
+        print("    Modes:")
+        print("        set - set colorscheme")
+        print("        del (delete) - delete colorscheme")
+        print("        conv (convert) - convert colorscheme from other formats")
+        print("        list - print colorschemes")
+        print("        help - print help")
         exit(0)
 
     @staticmethod
