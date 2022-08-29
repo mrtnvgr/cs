@@ -64,7 +64,7 @@ class Main:
             path = os.path.join(path, "colors.properties")
             template = open(os.path.join(self.path_me, "templates", "optional", "colors.termux")).read()
             open(path, "w").write(template.format(**self.scheme))
-            #TODO: reload termux
+            subprocess.run(["termux-reload-settings"])
 
     def convertColorscheme(self):
         if os.path.exists(self.args.name):
