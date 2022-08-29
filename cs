@@ -14,7 +14,8 @@ class Main:
                                                       "convert",
                                                       "conv",
                                                       "delete",
-                                                      "del") )
+                                                      "del",
+                                                      "list") )
         parser.add_argument("name", type=str)
         self.args = parser.parse_args()
 
@@ -51,6 +52,8 @@ class Main:
             self.convertColorscheme()
         elif self.args.cmd in ("delete","del"):
             self.deleteColorscheme()
+        elif self.args.cmd == "list":
+            self.listColorschemes()
 
     def getColorscheme(self):
         for path in self.path_colorschemes:
@@ -112,6 +115,13 @@ class Main:
                 if ch=="y":
                     os.remove(path)
 
+    def listColorschemes(self):
+        print(f"[{self.paint(2, '*')}] Colorschemes: ")
+        for path in self.path_colorschemes:
+            for file in os.listdir(path):
+                if file.endswith(".json"):
+                    print(f"    - {self.beautify(file)}")
+
     def updaters(self):
         self.updateTermux()
         self.updatexrdb()
@@ -162,6 +172,16 @@ class Main:
     @staticmethod
     def paint(color, text, bold=1):
         return f"\x1b[{0+bold};{color+30};40m{text}\x1b[0m"
+
+    @staticmethod
+    def beautify(text):
+        text = text.removesuffix(".json")
+        if "_" in text:
+            text = text.replace("_", " ")
+        else:
+            if "-" in text:
+                text = text.replace("_", " ")
+        return text.title()
 
     @staticmethod
     def strip(color):
