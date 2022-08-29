@@ -28,12 +28,12 @@ class Main:
 
     def cmds(self):
         if self.args.cmd=="set":
-            print("[*] Getting colorscheme...")
+            print(f"[{self.paint(2, '*')}] Getting colorscheme...")
             self.scheme = self.getColorscheme()
             self.getFullColorScheme()
-            print("[*] Generating templates...")
+            print(f"[{self.paint(2, '*')}] Generating templates...")
             self.generateTemplates()
-            print("[*] Updating colors...")
+            print(f"[{self.paint(2, '*')}] Updating colors...")
             self.updaters()
             self.genStatus()
             self.currentScheme()
@@ -48,7 +48,7 @@ class Main:
             path = os.path.join(path, f"{self.args.name}.json")
             if os.path.exists(path):
                 return json.load(open(path))
-        print(f"Unknown colorscheme: {self.args.name}")
+        print(f"[{self.paint(1, 'x')}] Unknown colorscheme: {self.args.name}")
         exit(1)
 
     def getFullColorScheme(self):
@@ -87,13 +87,13 @@ class Main:
                             self.scheme[color] = text[pack][color]
                     self.saveColorscheme()
         else:
-            print(f"File {self.args.name} doesnt exist")
+            print(f"[{self.paint(1, 'x')}] File {self.args.name} doesnt exist")
 
     def saveColorscheme(self):
         path = os.path.join(self.path_config, "colorschemes",
                             self.args.name)
         json.dump(self.scheme, open(path, "w"))
-        print(f"Saved to {path}")
+        print(f"[{self.paint(3, '*')}] Colorscheme saved to {path}")
 
     def updaters(self):
         self.updateTermux()
@@ -114,7 +114,7 @@ class Main:
                                  check=False,
                                  stderr=subprocess.DEVNULL).returncode
             if rc==1:
-                print("[!] Xresources failed")
+                print(f"[{self.paint(3, '!')}] Xresources failed")
 
     def updatetty(self):
         path = os.path.join(os.getenv("HOME"), ".cache",
@@ -130,7 +130,7 @@ class Main:
         json.dump(status, open(path,"w"))
 
     def currentScheme(self):
-        print(f"Current colorscheme: {self.args.name.title()}")
+        print(f"[{self.paint(2, '*')}] Current colorscheme: {self.args.name.title()}")
         self.colorPalette()
 
     def colorPalette(self):
@@ -141,6 +141,10 @@ class Main:
                 i = "8;5;%s" % i
             print("\033[4%sm%s\033[0m" % (i, " " * (80 // 20)), end="")
         print("\n")
+
+    @staticmethod
+    def paint(color, text, bold=1):
+        return f"\x1b[{0+bold};{color+30};40m{text}\x1b[0m"
 
     @staticmethod
     def strip(color):
