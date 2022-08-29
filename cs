@@ -28,9 +28,12 @@ class Main:
 
     def cmds(self):
         if self.args.cmd=="set":
+            print("[*] Getting colorscheme...")
             self.scheme = self.getColorscheme()
             self.getFullColorScheme()
+            print("[*] Generating templates...")
             self.generateTemplates()
+            print("[*] Updating colors...")
             self.updaters()
             self.genStatus()
             self.currentScheme()
@@ -70,7 +73,7 @@ class Main:
                                          "optional",
                                          "colors.termux")).read()
             open(path, "w").write(template.format(**self.scheme))
-            subprocess.run(["termux-reload-settings"])
+            
 
     def convertColorscheme(self):
         if os.path.exists(self.args.name):
@@ -93,15 +96,25 @@ class Main:
         print(f"Saved to {path}")
 
     def updaters(self):
+        self.updateTermux()
         self.updatexrdb()
         self.updatetty()
+
+    def updateTermux(self):
+        path = os.path.join(self.path_home, ".termux")
+        if os.path.exists(path):
+            subprocess.run(["termux-reload-settings"])
+
 
     def updatexrdb(self):
         path = os.path.join(os.getenv("HOME"), ".cache",
                             "cs", "colors.Xresources")
         if shutil.which("xrdb"):
-            subprocess.run(["xrdb", "-merge", "-quiet", path],
-                            check=False)
+            rc = subprocess.run(["xrdb", "-merge", "-quiet", path],
+                                 check=False,
+                                 stderr=subprocess.DEVNULL).returncode
+            if rc==1:
+                print("[!] Xresources failed")
 
     def updatetty(self):
         path = os.path.join(os.getenv("HOME"), ".cache",
