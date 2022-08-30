@@ -1,4 +1,4 @@
-import subprocess, re
+import subprocess, logger, re
 
 def gen(img, light=False):
     colors = genColors(img)
@@ -7,8 +7,12 @@ def gen(img, light=False):
 def getColors(colors, img):
     args = ["-resize", "25%", "-colors", str(colors),
             "-unique-colors", "txt:-"]
-    img += "[0]"
-    colors = subprocess.check_output(["convert", img, *args]).splitlines()
+    try:
+        colors = subprocess.check_output(["convert", f"{img}[0]", *args], 
+                                          stderr=subprocess.DEVNULL).splitlines()
+    except subprocess.CalledProcessError:
+        logger.error(f"File {img} doesnt exist")
+        exit(1)
     return [re.search("#.{6}", str(col)).group(0) for col in colors[1:]]
 
 def genColors(img):

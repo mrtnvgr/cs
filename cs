@@ -1,7 +1,7 @@
 #!/bin/python
 import subprocess, shutil, \
        json, os, sys
-import generator
+import generator, logger
 
 class Namespace:
     def __init__(self, **kwargs):
@@ -62,7 +62,7 @@ class Main:
                     self.genStatus()
                     self.currentScheme()
                 elif self.args.cmd in ("generate", "gen"):
-                    print(f"[{self.paint(2, '*')}] Generating colors from wallpaper...")
+                    logger.info("Generating colors from wallpaper...")
                     self.scheme = generator.gen(self.args.name)
                     # TODO: light arg, genstatus light tag
                     self.setColorscheme()
@@ -73,7 +73,7 @@ class Main:
                 elif self.args.cmd in ("delete","del"):
                     self.deleteColorscheme()
             else:
-                print(f"[{self.paint(1, 'x')}] error: Unknown command or invalid usage")
+                logger.error("Unknown command or invalid usage")
                 exit(1)
 
     def setColorscheme(self):
@@ -82,13 +82,13 @@ class Main:
         self.updaters()
 
     def getColorscheme(self):
-        print(f"[{self.paint(2, '*')}] Getting colorscheme...")
+        logger.info("Getting colorscheme...")
         for path in self.path_colorschemes:
             path = os.path.join(path, f"{self.args.name}.json")
             if os.path.exists(path):
                 self.scheme_path = path
                 return json.load(open(path))
-        print(f"[{self.paint(1, 'x')}] error: Unknown colorscheme: {self.args.name}")
+        logger.error(f"Unknown colorscheme: {self.args.name}")
         exit(1)
 
     def getFullColorScheme(self):
@@ -96,7 +96,7 @@ class Main:
             self.scheme[f"{color}_strip"] = self.scheme[color][1:]
 
     def generateTemplates(self):
-        print(f"[{self.paint(2, '*')}] Generating templates...")
+        logger.info("Generating templates...")
         path = os.path.join(self.path_me, "templates")
         for file in os.listdir(path):
             path = os.path.join(path, file)
@@ -128,31 +128,32 @@ class Main:
                             self.scheme[color] = text[pack][color]
                     self.saveColorscheme()
         else:
-            print(f"[{self.paint(1, 'x')}] error: File {self.args.name} doesnt exist")
+            logger.error(f"File {self.args.name} doesnt exist")
+            exit(1)
 
     def saveColorscheme(self):
         path = os.path.join(self.path_config, "colorschemes",
                             self.args.name)
         json.dump(self.scheme, open(path, "w"))
-        print(f"[{self.paint(3, '*')}] Colorscheme saved to {path}")
+        logger.info(f"Colorscheme saved to {path}")
 
     def deleteColorscheme(self):
         for folder in self.path_colorschemes:
             path = os.path.join(folder, f"{self.args.name}.json")
             if os.path.exists(path):
-                ch = input(f"[{self.paint(3, '!')}] delete: {path} (y/n): ").lower()
+                ch = logger.warning(f"delete: {path} (y/n): ", func=input).lower()
                 if ch=="y":
                     os.remove(path)
 
     def listColorschemes(self):
-        print(f"[{self.paint(2, '*')}] Colorschemes: ")
+        logger.info("Colorschemes: ")
         for path in self.path_colorschemes:
             for file in os.listdir(path):
                 if file.endswith(".json"):
                     print(f"    - {self.beautify(file)}")
 
     def updaters(self):
-        print(f"[{self.paint(2, '*')}] Updating colors...")
+        logger.info("Updating colors...")
         self.updateTermux()
         self.updatexrdb()
         self.updatetty()
@@ -171,7 +172,7 @@ class Main:
                                  check=False,
                                  stderr=subprocess.DEVNULL).returncode
             if rc==1:
-                print(f"[{self.paint(3, '!')}] Xresources failed")
+                logger.warning("Xresources failed")
 
     def updatetty(self):
         path = os.path.join(os.getenv("HOME"), ".cache",
@@ -194,9 +195,8 @@ class Main:
         json.dump(status, open(path,"w"))
 
     def currentScheme(self, name=True):
-        line = f"[{self.paint(2, '*')}] Current colorscheme: "
-        if name: line += f"{self.beautify(self.args.name)}"
-        print(line)
+        logger.info("Current colorscheme: ", func_args={"end": ''})
+        if name: print(f"{self.beautify(self.args.name)}")
         self.colorPalette()
 
     def colorPalette(self):
@@ -205,7 +205,7 @@ class Main:
                 print()
             if i > 7:
                 i = "8;5;%s" % i
-            print("\033[4%sm%s\033[0m" % (i, " " * (80 // 20)), end="")
+            print("\033[4%sm%s\033[0m" % (i, " "*4), end="")
         print("\n")
 
     def help(self):
@@ -219,10 +219,6 @@ class Main:
         print("        list - print colorschemes")
         print("        help - print help")
         exit(0)
-
-    @staticmethod
-    def paint(color, text, bold=1):
-        return f"\x1b[{0+bold};{color+30};40m{text}\x1b[0m"
 
     @staticmethod
     def beautify(text):
