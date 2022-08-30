@@ -52,16 +52,22 @@ class Main:
                 self.args.name = json.load(open(path))["colorscheme"]["name"]
                 self.scheme = self.getColorscheme()
                 self.setColorscheme()
+                self.genStatus()
+                self.currentScheme()
         else:
             if self.args.name!=None:
                 if self.args.cmd=="set":
                     self.scheme = self.getColorscheme()
                     self.setColorscheme()
+                    self.genStatus()
+                    self.currentScheme()
                 elif self.args.cmd in ("generate", "gen"):
                     print(f"[{self.paint(2, '*')}] Generating colors from wallpaper...")
                     self.scheme = generator.gen(self.args.name)
-                    # TODO: light arg, change args.name to normal, genstatus wallpaper tag
+                    # TODO: light arg, genstatus light tag
                     self.setColorscheme()
+                    self.genStatus(wallpaper=True)
+                    self.currentScheme(name=False)
                 elif self.args.cmd in ("convert","conv"):
                     self.convertColorscheme()
                 elif self.args.cmd in ("delete","del"):
@@ -74,14 +80,13 @@ class Main:
         self.getFullColorScheme()
         self.generateTemplates()
         self.updaters()
-        self.genStatus()
-        self.currentScheme()
 
     def getColorscheme(self):
         print(f"[{self.paint(2, '*')}] Getting colorscheme...")
         for path in self.path_colorschemes:
             path = os.path.join(path, f"{self.args.name}.json")
             if os.path.exists(path):
+                self.scheme_path = path
                 return json.load(open(path))
         print(f"[{self.paint(1, 'x')}] error: Unknown colorscheme: {self.args.name}")
         exit(1)
@@ -175,14 +180,23 @@ class Main:
         if term=="linux":
             subprocess.run(["sh", path])
         
-    def genStatus(self):
+    def genStatus(self, wallpaper=False):
         path = os.path.join(os.getenv("HOME"), ".cache",
                             "cs", "status.json")
-        status = {"colorscheme": {"name": self.args.name}}
+        status = {"source": {}, "colorscheme": {"name": self.args.name}}
+        
+        if wallpaper:
+            status["source"]["type"] = "wallpapper"
+            status["source"]["path"] = os.path.abspath(self.args.name)
+        else:
+            status["source"]["type"] = "colorscheme"
+            status["source"]["path"] = self.scheme_path
         json.dump(status, open(path,"w"))
 
-    def currentScheme(self):
-        print(f"[{self.paint(2, '*')}] Current colorscheme: {self.beautify(self.args.name)}")
+    def currentScheme(self, name=True):
+        line = f"[{self.paint(2, '*')}] Current colorscheme: "
+        if name: line += f"{self.beautify(self.args.name)}"
+        print(line)
         self.colorPalette()
 
     def colorPalette(self):
