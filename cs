@@ -141,7 +141,7 @@ class Main:
         for folder in self.path_colorschemes:
             path = os.path.join(folder, f"{self.args.name}.json")
             if os.path.exists(path):
-                ch = logger.warning(f"delete: {path} (y/n): ", func=input).lower()
+                ch = logger.warning(f"Delete: {path} (y/n): ", func=input).lower()
                 if ch=="y":
                     os.remove(path)
 

@@ -1,4 +1,4 @@
-import subprocess, logger, re
+import subprocess, colorsys, logger, re
 
 def gen(img, light=False):
     colors = genColors(img)
@@ -76,3 +76,12 @@ def blend(color, color2):
     b3 = int(0.5 * b1 + 0.5 * b2)
 
     return rgb_to_hex((r3, g3, b3))
+
+def saturate(color, amount):
+    r, g, b = hex_to_rgb(color)
+    r, g, b = [x / 255.0 for x in (r, g, b)]
+    h, l, s = colorsys.rgb_to_hls(r, g, b)
+    s = amount
+    r, g, b = colorsys.hls_to_rgb(h, l, s)
+    r, g, b = [x * 255.0 for x in (r, g, b)]
+    return rgb_to_hex((int(r), int(g), int(b)))
