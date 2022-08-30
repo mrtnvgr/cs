@@ -15,13 +15,18 @@ class Main:
 
     def getargs(self):
         args = sys.argv
+        light = False
+        for arg in args:
+            if arg in ("-l", "--light"):
+                light = True
+                args.remove(arg)
         if len(args)==1:
             self.help()
         elif len(args)==2:
             name = None
         else:
             name = args[2]
-        self.args = Namespace(cmd=args[1], name=name)
+        self.args = Namespace(cmd=args[1], name=name, light=light)
 
     def setpaths(self):
         self.path_me = os.path.dirname(os.path.realpath(__file__))
@@ -56,8 +61,9 @@ class Main:
                     name = True
                 elif status["source"]["type"]=="wallpaper":
                     logger.info("Generating colors from wallpaper...")
+                    light = status["colorscheme"]["light"]
                     self.scheme_path = status["source"]["path"]
-                    self.scheme = generator.gen(self.scheme_path)
+                    self.scheme = generator.gen(self.scheme_path, light=light)
                     name = False
                 else:
                     logger.error("Invalid source type")
@@ -74,8 +80,8 @@ class Main:
                     self.currentScheme()
                 elif self.args.cmd in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
-                    self.scheme = generator.gen(self.args.name)
-                    # TODO: light arg, genstatus light tag
+                    self.scheme = generator.gen(self.args.name, light=self.args.light)
+                    # TODO: genstatus light tag
                     self.setColorscheme()
                     self.genStatus(wallpaper=True)
                     self.currentScheme(name=False)
@@ -195,7 +201,9 @@ class Main:
     def genStatus(self, wallpaper=False):
         path = os.path.join(os.getenv("HOME"), ".cache",
                             "cs", "status.json")
-        status = {"source": {}, "colorscheme": {"name": self.args.name}}
+        status = {"source": {}, 
+                  "colorscheme": {"name": self.args.name, 
+                                  "light": self.args.light}}
         
         if wallpaper:
             status["source"]["type"] = "wallpaper"
@@ -229,6 +237,8 @@ class Main:
         print("        rel (reload) - reload templates")
         print("        list - print colorschemes")
         print("        help - print help")
+        print("    Optional arguments:")
+        print("        -l (--light) - generate light colorscheme")
         exit(0)
 
     @staticmethod

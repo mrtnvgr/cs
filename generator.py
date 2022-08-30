@@ -30,6 +30,7 @@ def genColors(img):
 def adjustColors(colors, light):
     raw_colors = colors[:1] + colors[8:16] + colors[8:-1]
     if light:
+        logger.info("Generating light colorscheme...")
         for color in raw_colors:
             color = saturate(color, 0.5)
         raw_colors[0] = lighten(colors[-1], 0.85)
@@ -42,7 +43,7 @@ def adjustColors(colors, light):
         raw_colors[7] = blend(raw_colors[7], "#EEEEEE")
         raw_colors[8] = darken(raw_colors[7], 0.30)
         raw_colors[15] = blend(raw_colors[15], "#EEEEEE")
-    return colors
+    return raw_colors
 
 def build(colors):
     clrs = {}
