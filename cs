@@ -1,6 +1,7 @@
 #!/bin/python
 import subprocess, shutil, \
        json, os, sys
+import generator
 
 class Namespace:
     def __init__(self, **kwargs):
@@ -49,11 +50,18 @@ class Main:
             path = os.path.join(self.path_cache, "status.json")
             if os.path.exists(path):
                 self.args.name = json.load(open(path))["colorscheme"]["name"]
+                self.scheme = self.getColorscheme()
                 self.setColorscheme()
         else:
             if self.args.name!=None:
                 if self.args.cmd=="set":
-                    self.setColorscheme()  
+                    self.scheme = self.getColorscheme()
+                    self.setColorscheme()
+                elif self.args.cmd in ("generate", "gen"):
+                    print(f"[{self.paint(2, '*')}] Generating colors from wallpaper...")
+                    self.scheme = generator.gen(self.args.name)
+                    # TODO: light arg, change args.name to normal, genstatus wallpaper tag
+                    self.setColorscheme()
                 elif self.args.cmd in ("convert","conv"):
                     self.convertColorscheme()
                 elif self.args.cmd in ("delete","del"):
@@ -63,7 +71,6 @@ class Main:
                 exit(1)
 
     def setColorscheme(self):
-        self.scheme = self.getColorscheme()
         self.getFullColorScheme()
         self.generateTemplates()
         self.updaters()
@@ -192,6 +199,7 @@ class Main:
         print("    Modes:")
         print("        set - set colorscheme")
         print("        del (delete) - delete colorscheme")
+        print("        gen (generate) - generate colorscheme from wallpaper")
         print("        conv (convert) - convert colorscheme from other formats")
         print("        rel (reload) - reload templates")
         print("        list - print colorschemes")

@@ -2,7 +2,7 @@ import subprocess, re
 
 def gen(img, light=False):
     colors = genColors(img)
-    return adjustColors(colors, light)
+    return build(adjustColors(colors, light))
 
 def getColors(colors, img):
     args = ["-resize", "25%", "-colors", str(colors),
@@ -40,6 +40,15 @@ def adjustColors(colors, light):
         raw_colors[15] = blend(raw_colors[15], "#EEEEEE")
     return colors
 
+def build(colors):
+    clrs = {}
+    clrs["background"] = colors[0]
+    clrs["foreground"] = colors[15]
+    clrs["cursor"] = colors[15]
+    for index,color in enumerate(colors[:-1]):
+        clrs[f"color{index}"] = color
+    return clrs
+
 def hex_to_rgb(color):
     return tuple(bytes.fromhex(color.strip("#")))
 
@@ -63,5 +72,3 @@ def blend(color, color2):
     b3 = int(0.5 * b1 + 0.5 * b2)
 
     return rgb_to_hex((r3, g3, b3))
-
-print(gen("120.jpg"))
