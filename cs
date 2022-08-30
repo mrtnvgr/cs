@@ -54,23 +54,10 @@ class Main:
         elif self.args.cmd in ("reload", "rel"):
             path = os.path.join(self.path_cache, "status.json")
             if os.path.exists(path):
-                status = json.load(open(path))
-                if status["source"]["type"]=="colorscheme":
-                    self.args.name = status["colorscheme"]["name"]
-                    self.scheme = self.getColorscheme()
-                    name = True
-                elif status["source"]["type"]=="wallpaper":
-                    logger.info("Generating colors from wallpaper...")
-                    light = status["colorscheme"]["light"]
-                    self.scheme_path = status["source"]["path"]
-                    self.scheme = generator.gen(self.scheme_path, light=light)
-                    name = False
-                else:
-                    logger.error("Invalid source type")
-                    exit(1)
-                self.setColorscheme()
-                self.genStatus()
-                self.currentScheme(name=name)
+                self.updaters()
+            else:
+                logging.error("Status file doesnt exist")
+                exit(1)
         else:
             if self.args.name!=None:
                 if self.args.cmd=="set":
