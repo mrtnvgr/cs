@@ -1,7 +1,7 @@
 #!/bin/python
 import subprocess, shutil, \
        json, os, sys
-import generator, logger
+import generator, status, logger
 
 class Namespace:
     def __init__(self, **kwargs):
@@ -58,6 +58,10 @@ class Main:
             else:
                 logging.error("Status file doesnt exist")
                 exit(1)
+        elif self.args.cmd in ("status", "stat"):
+            path = os.path.join(self.path_cache, "status.json")
+            print(status.get(path, self.args.name))
+            exit(0)
         else:
             if self.args.name!=None:
                 if self.args.cmd=="set":
@@ -222,6 +226,7 @@ class Main:
         print("        gen (generate) {path} - generate colorscheme from wallpaper")
         print("        imp (import) {path} - import colorscheme from other formats")
         print("        rel (reload) - reload templates")
+        print("        stat (status) {.output.type} - print status element")
         print("        list - print colorschemes")
         print("        help - print help")
         print("    Optional arguments:")
