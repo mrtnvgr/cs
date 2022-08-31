@@ -72,8 +72,8 @@ class Main:
                     self.setColorscheme()
                     self.genStatus(wallpaper=True)
                     self.currentScheme(name=False)
-                elif self.args.cmd in ("convert","conv"):
-                    self.convertColorscheme()
+                elif self.args.cmd in ("import","imp"):
+                    self.importColorscheme()
                 elif self.args.cmd in ("delete","del"):
                     self.deleteColorscheme()
             else:
@@ -120,7 +120,7 @@ class Main:
             open(path, "w").write(template.format(**self.scheme))
             
 
-    def convertColorscheme(self):
+    def importColorscheme(self):
         if os.path.exists(self.args.name):
             text = open(self.args.name).read()
             if text[0]=="{":
@@ -220,7 +220,7 @@ class Main:
         print("        set {name} - set colorscheme")
         print("        del (delete) {name} - delete colorscheme")
         print("        gen (generate) {path} - generate colorscheme from wallpaper")
-        print("        conv (convert) {path} - convert colorscheme from other formats")
+        print("        imp (import) {path} - import colorscheme from other formats")
         print("        rel (reload) - reload templates")
         print("        list - print colorschemes")
         print("        help - print help")
