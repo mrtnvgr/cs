@@ -56,7 +56,7 @@ class Main:
             if os.path.exists(path):
                 self.updaters()
             else:
-                logging.error("Status file doesnt exist")
+                logger.error("Status file doesnt exist")
                 exit(1)
         elif self.args.cmd in ("status", "stat"):
             path = os.path.join(self.path_cache, "status.json")
