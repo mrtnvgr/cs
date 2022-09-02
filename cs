@@ -142,7 +142,7 @@ class Main:
     def saveColorscheme(self):
         path = os.path.join(self.path_config, "colorschemes",
                             self.args.name)
-        json.dump(self.scheme, open(path, "w"))
+        json.dump(self.scheme, open(path, "w"), indent=4)
         logger.info(f"Colorscheme saved to {path}")
 
     def deleteColorscheme(self):
@@ -202,7 +202,7 @@ class Main:
         else:
             status["source"]["type"] = "colorscheme"
             status["source"]["path"] = self.scheme_path
-        json.dump(status, open(path,"w"))
+        json.dump(status, open(path,"w"), indent=4)
 
     def currentScheme(self, name=True):
         logger.info("Current colorscheme: ", func_args={"end": ''})

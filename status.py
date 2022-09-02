@@ -8,6 +8,8 @@ def get(path, string):
             for elem in string.split("."):
                 if elem!="":
                     status = status[elem]
+        if type(status) is dict:
+            status = json.dumps(status, indent=4)
         return status
     else:
         logger.error("Status file doesnt exist")
