@@ -1,5 +1,5 @@
 #!/bin/python
-import generator, status, updaters, logger
+import generator, status, reload, logger
 import json, os, sys
 
 class Namespace:
@@ -53,7 +53,7 @@ class Main:
         elif self.args.cmd in ("reload", "rel"):
             path = os.path.join(self.path_cache, "status.json")
             if os.path.exists(path):
-                updaters.update_all()
+                reload.update_all()
             else:
                 logger.error("Status file doesnt exist")
                 exit(1)

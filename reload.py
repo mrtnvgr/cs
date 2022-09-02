@@ -1,19 +1,19 @@
 import subprocess, shutil, os
 import logger
 
-def update_all():
-    logger.info("Updating colors...")
-    update_termux()
-    update_xrdb()
-    update_tty()
+def reload_all():
+    logger.info("Reloading colors...")
+    reload_termux()
+    reload_xrdb()
+    reload_tty()
+    reload_qtile()
 
-def update_termux():
+def reload_termux():
     path = os.path.join(os.getenv("HOME"), ".termux")
     if os.path.exists(path):
         subprocess.run(["termux-reload-settings"])
 
-
-def update_xrdb():
+def reload_xrdb():
     path = os.path.join(os.getenv("HOME"), ".cache",
                         "cs", "colors.Xresources")
     if shutil.which("xrdb"):
@@ -23,9 +23,12 @@ def update_xrdb():
         if rc==1:
             logger.warning("Xresources failed")
 
-def update_tty():
+def reload_tty():
     path = os.path.join(os.getenv("HOME"), ".cache",
                         "cs", "colors.sh")
     term = os.getenv("TERM")
     if term=="linux":
         subprocess.run(["sh", path])
+
+def reload_qtile():
+    pass
