@@ -217,5 +217,6 @@ class Main:
     def strip(color):
         return color[1:]
 
-if __name__=="__main__":
-    Main()
+def main():
+    if __name__=="__main__":
+        Main()
