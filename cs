@@ -1,7 +1,6 @@
 #!/bin/python
-import subprocess, shutil, \
-       json, os, sys
-import generator, status, logger
+import generator, status, updaters, logger
+import json, os, sys
 
 class Namespace:
     def __init__(self, **kwargs):
@@ -54,7 +53,7 @@ class Main:
         elif self.args.cmd in ("reload", "rel"):
             path = os.path.join(self.path_cache, "status.json")
             if os.path.exists(path):
-                self.updaters()
+                updaters.update_all()
             else:
                 logger.error("Status file doesnt exist")
                 exit(1)
@@ -159,35 +158,6 @@ class Main:
             for file in os.listdir(path):
                 if file.endswith(".json"):
                     print(f"    - {self.beautify(file)}")
-
-    def updaters(self):
-        logger.info("Updating colors...")
-        self.updateTermux()
-        self.updatexrdb()
-        self.updatetty()
-
-    def updateTermux(self):
-        path = os.path.join(self.path_home, ".termux")
-        if os.path.exists(path):
-            subprocess.run(["termux-reload-settings"])
-
-
-    def updatexrdb(self):
-        path = os.path.join(os.getenv("HOME"), ".cache",
-                            "cs", "colors.Xresources")
-        if shutil.which("xrdb"):
-            rc = subprocess.run(["xrdb", "-merge", "-quiet", path],
-                                 check=False,
-                                 stderr=subprocess.DEVNULL).returncode
-            if rc==1:
-                logger.warning("Xresources failed")
-
-    def updatetty(self):
-        path = os.path.join(os.getenv("HOME"), ".cache",
-                            "cs", "colors.sh")
-        term = os.getenv("TERM")
-        if term=="linux":
-            subprocess.run(["sh", path])
         
     def genStatus(self, wallpaper=False):
         path = os.path.join(os.getenv("HOME"), ".cache",
