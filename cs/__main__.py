@@ -1,5 +1,8 @@
 #!/bin/python
-import generator, status, reload, logger
+from cs import generator
+from cs import status
+from cs import reload
+from cs import logger
 import json, os, sys
 
 class Namespace:
@@ -86,7 +89,7 @@ class Main:
     def setColorscheme(self):
         self.getFullColorScheme()
         self.generateTemplates()
-        self.updaters()
+        reload.reload_all()
 
     def getColorscheme(self):
         logger.info("Getting colorscheme...")
@@ -218,5 +221,7 @@ class Main:
         return color[1:]
 
 def main():
-    if __name__=="__main__":
-        Main()
+    Main()
+
+if __name__=="__main__":
+    main()

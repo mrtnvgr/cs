@@ -1,4 +1,5 @@
-import subprocess, colorsys, logger, re
+import subprocess, colorsys, re
+from cs import logger
 
 def gen(img, light=False):
     colors = genColors(img)

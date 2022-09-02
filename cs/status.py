@@ -1,5 +1,5 @@
 import os, json
-import logger
+from cs import logger
 
 def get(path, string):
     if os.path.exists(path):

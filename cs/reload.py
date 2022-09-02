@@ -1,5 +1,5 @@
 import subprocess, platform, shutil, os
-import logger
+from cs import logger
 
 def reload_all():
     logger.info("Reloading colors...")
