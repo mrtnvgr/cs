@@ -1,4 +1,4 @@
-import subprocess, shutil, os
+import subprocess, platform, shutil, os
 import logger
 
 def reload_all():
@@ -31,4 +31,22 @@ def reload_tty():
         subprocess.run(["sh", path])
 
 def reload_qtile():
-    pass
+    if shutil.which("qtile") and getpid("qtile"):
+        cmd = ["pkill", "-SIGUSR1", "qtile"]
+        if not shutil.which("pkill"):
+            logger.warning("pkill not found??? trying killall...")
+            cmd[0] = "killall"
+        subprocess.run(cmd, check=False,
+                       stderr=subprocess.DEVNULL)
+
+def getpid(name):
+    if not shutil.which("pidof"):
+        return False
+    try:
+        if platform.system() != 'Darwin':
+            subprocess.check_output(["pidof", "-s", name])
+        else:
+            subprocess.check_output(["pidof", name])
+    except subprocess.CalledProcessError:
+        return False
+    return True
