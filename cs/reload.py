@@ -1,4 +1,5 @@
 import subprocess, shutil, os
+from cs import sequences
 from cs import logger
 
 def reload_all():
@@ -6,6 +7,7 @@ def reload_all():
     reload_termux()
     reload_xrdb()
     reload_tty()
+    sequences.send()
     reload_qtile()
 
 def reload_termux():
