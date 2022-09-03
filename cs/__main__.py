@@ -56,7 +56,7 @@ class Main:
         elif self.args.cmd in ("reload", "rel"):
             path = os.path.join(self.path_cache, "status.json")
             if os.path.exists(path):
-                reload.update_all()
+                reload.reload_all()
             else:
                 logger.error("Status file doesnt exist")
                 exit(1)
@@ -107,10 +107,10 @@ class Main:
 
     def generateTemplates(self):
         logger.info("Generating templates...")
-        path = os.path.join(self.path_me, "templates")
-        for file in os.listdir(path):
-            path = os.path.join(path, file)
-            if os.path.isfile(path):
+        templates_path = os.path.join(self.path_me, "templates")
+        for file in os.listdir(templates_path):
+            path = os.path.join(templates_path, file)
+            if not os.path.isdir(path):
                 template = open(path).read()
                 template = template.format(**self.scheme)
                 open(os.path.join(self.path_cache, file), "w").write(template)

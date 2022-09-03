@@ -1,4 +1,4 @@
-import subprocess, platform, shutil, os
+import subprocess, shutil, os
 from cs import logger
 
 def reload_all():
@@ -14,12 +14,17 @@ def reload_termux():
         subprocess.run(["termux-reload-settings"])
 
 def reload_xrdb():
-    path = os.path.join(os.getenv("HOME"), ".cache",
-                        "cs", "colors.Xresources")
+    generated = os.path.join(os.getenv("HOME"), ".cache",
+                             "cs", "colors.Xresources")
+    files = [generated]
+    user = os.path.join(os.getenv("HOME"), ".Xresources")
+    if os.path.exists(user):
+        files.append(user)
     if shutil.which("xrdb"):
-        rc = subprocess.run(["xrdb", "-merge", "-quiet", path],
-                             check=False,
-                             stderr=subprocess.DEVNULL).returncode
+        for file in files:
+            rc = subprocess.run(["xrdb", "-merge", "-quiet", file],
+                                 check=False,
+                                 stderr=subprocess.DEVNULL).returncode
         if rc==1:
             logger.warning("Xresources failed")
 
@@ -31,22 +36,10 @@ def reload_tty():
         subprocess.run(["sh", path])
 
 def reload_qtile():
-    if shutil.which("qtile") and getpid("qtile"):
+    if shutil.which("qtile"):
         cmd = ["pkill", "-SIGUSR1", "qtile"]
         if not shutil.which("pkill"):
             logger.warning("pkill not found??? trying killall...")
             cmd[0] = "killall"
         subprocess.run(cmd, check=False,
                        stderr=subprocess.DEVNULL)
-
-def getpid(name):
-    if not shutil.which("pidof"):
-        return False
-    try:
-        if platform.system() != 'Darwin':
-            subprocess.check_output(["pidof", "-s", name])
-        else:
-            subprocess.check_output(["pidof", name])
-    except subprocess.CalledProcessError:
-        return False
-    return True
