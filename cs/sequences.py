@@ -18,14 +18,12 @@ def set_color(index, color):
 
 
 def create_sequences(colors, vte_fix=False):
-    alpha = 255
-
     sequences = [set_color(index, colors["color%s" % index])
                  for index in range(16)]
 
     sequences.extend([
         set_special(10, colors["foreground"], "g"),
-        set_special(11, colors["background"], "h", alpha),
+        set_special(11, colors["background"], "h"),
         set_special(12, colors["cursor"], "l"),
         set_special(13, colors["foreground"], "j"),
         set_special(17, colors["foreground"], "k"),
@@ -37,7 +35,7 @@ def create_sequences(colors, vte_fix=False):
 
     if not vte_fix:
         sequences.extend(
-            set_special(708, colors["background"], "", alpha)
+            set_special(708, colors["background"], "")
         )
 
     return "".join(sequences)

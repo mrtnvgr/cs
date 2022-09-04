@@ -26,13 +26,13 @@ def reload_xrdb():
         for file in files:
             rc = subprocess.run(["xrdb", "-merge", "-quiet", file],
                                  check=False,
-                                 stderr=subprocess.DEVNULL).returncode
-        if rc==1:
-            logger.warning("Xresources failed")
+                                 stderr=subprocess.DEVNULL)
+        # if rc.returncode==1:
+        #     logger.warning("Xresources failed")
 
 def reload_tty():
     path = os.path.join(os.getenv("HOME"), ".cache",
-                        "cs", "colors.sh")
+                        "cs", "colors-tty.sh")
     term = os.getenv("TERM")
     if term=="linux":
         subprocess.run(["sh", path])
