@@ -19,12 +19,14 @@ class Importer:
             else:
                 # XRESOURCES
                 specials = ["foreground", "background", "cursor"]
-                elems = specials
+                elems = list(specials)
                 elems += [f"color{i}" for i in range(0,16)]
                 for line in self.text.split("\n"):
                     if not line.startswith("!"):
                         line = line.replace(" ", "").lower().split(":")
                         if any(line):
+                            if any([special in line[0] and special not in elems for special in specials]):
+                                continue
                             for elem in elems:
                                 if elem in line[0]:
                                     if elem not in self.scheme:
