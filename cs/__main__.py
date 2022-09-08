@@ -160,7 +160,7 @@ class Main:
         for path in self.path_colorschemes:
             for file in os.listdir(path):
                 if file.endswith(".json"):
-                    print(f"    - {self.beautify(file)}")
+                    print(f"    - {self.beautify(file)} ({file.removesuffix('.json')})")
         
     def genStatus(self, wallpaper=False):
         path = os.path.join(os.getenv("HOME"), ".cache",
