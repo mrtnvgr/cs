@@ -148,11 +148,15 @@ class Main:
                     os.remove(path)
 
     def listColorschemes(self):
-        logger.info("Colorschemes: ")
+        files = []
         for path in self.path_colorschemes:
             for file in os.listdir(path):
-                if file.endswith(".json"):
-                    print(f"    - {self.beautify(file)} ({file.removesuffix('.json')})")
+                files.append(file)
+
+        logger.info("Colorschemes: ")
+        for file in sorted(files):
+            if file.endswith(".json"):
+                print(f"    - {self.beautify(file)} ({file.removesuffix('.json')})")
         
     def genStatus(self, wallpaper=False):
         path = os.path.join(os.getenv("HOME"), ".cache",
