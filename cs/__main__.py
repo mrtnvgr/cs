@@ -1,6 +1,7 @@
 #!/bin/python
 from cs import generator
 from cs import status
+from cs import importer
 from cs import reload
 from cs import logger
 import json, os, sys
@@ -79,7 +80,14 @@ class Main:
                     self.genStatus(wallpaper=True)
                     self.currentScheme(name=False)
                 elif self.args.cmd in ("import","imp"):
-                    self.importColorscheme()
+                    imp = importer.Importer()
+                    self.scheme = imp.importColorscheme(self.args.name)
+                    if self.scheme:
+                        if not self.args.name.endswith(".json"):
+                            if "." in self.args.name:
+                                self.args.name = self.args.name.split(".")[1]
+                            self.args.name += ".json"
+                        self.saveColorscheme()
                 elif self.args.cmd in ("delete","del"):
                     self.deleteColorscheme()
             else:
@@ -124,22 +132,6 @@ class Main:
                                          "optional",
                                          "colors.termux")).read()
             open(path, "w").write(template.format(**self.scheme))
-            
-
-    def importColorscheme(self):
-        if os.path.exists(self.args.name):
-            text = open(self.args.name).read()
-            if text[0]=="{":
-                self.scheme = {}
-                text = json.loads(text)
-                if "colors" in text and "special" in text:
-                    for pack in ("special","colors"):
-                        for color in text[pack]:
-                            self.scheme[color] = text[pack][color]
-                    self.saveColorscheme()
-        else:
-            logger.error(f"File {self.args.name} doesnt exist")
-            exit(1)
 
     def saveColorscheme(self):
         path = os.path.join(self.path_config, "colorschemes",
