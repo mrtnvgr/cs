@@ -85,7 +85,7 @@ class Main:
                     if self.scheme:
                         if not self.args.name.endswith(".json"):
                             if "." in self.args.name:
-                                self.args.name = self.args.name.split(".")[1]
+                                self.args.name = self.args.name.split(".")[0]
                             self.args.name += ".json"
                         self.saveColorscheme()
                 elif self.args.cmd in ("delete","del"):

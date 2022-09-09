@@ -40,6 +40,3 @@ class Importer:
             if self.scheme!={}: return self.scheme
         logger.error(f"File {name} doesnt exist")
         exit(1)
-
-    def xresourcesParser(self, elems):
-        return elems
