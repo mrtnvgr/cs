@@ -1,4 +1,6 @@
 import platform, json, glob, os
+from pathlib import Path
+from cs import logger
 
 def set_special(index, color, iterm_name="h", alpha=100):
     if platform.system == "Darwin" and iterm_name:
@@ -53,8 +55,14 @@ def send(to_send=True, vte_fix=False):
 
     if to_send:
         for term in glob.glob(tty_pattern):
-            with open(term, "w") as file:
-                file.write(sequences)
+            try:
+                with open(term, "w") as file:
+                    file.write(sequences)
+            except PermissionError as p:
+                path = Path(p.filename)
+                owner = path.owner()
+                group = path.group()
+                logger.warning(f"Permission denied: {p.filename} is owned by {owner}:{group}")
     
     with open(os.path.join(cache_dir, "sequences"), "w") as file:
         file.write(sequences)
