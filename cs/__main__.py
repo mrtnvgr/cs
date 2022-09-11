@@ -91,7 +91,7 @@ class Main:
         self.getFullColorScheme()
         self.generateTemplates()
         status.gen(cs_name=self.args["name"], light=self.args["light"],
-                   cs_path=self.args.get("path",""), wallpaper=wallpaper)
+                   cs_path=self.args.get("path", self.args["name"]), wallpaper=wallpaper)
         reload.reload_all()
 
     def getColorscheme(self):

@@ -16,16 +16,19 @@ def get(path, string):
         exit(1)
 
 def gen(cs_name, light, cs_path, wallpaper=False):
-    status = {"source": {}, 
+    status = {"source": {"path": os.path.abspath(cs_path)}, 
               "colorscheme": {"name": cs_name, 
                               "light": light}}
     
     if wallpaper:
         status["source"]["type"] = "wallpaper"
-        status["source"]["path"] = os.path.abspath(cs_path)
+        name = os.path.basename(status["source"]["path"])
+        if "." in name:
+            name = ''.join(name.split(".")[:-1])
+        status["colorscheme"]["name"] = name
     else:
         status["source"]["type"] = "colorscheme"
-        status["source"]["path"] = cs_name 
+        status["colorscheme"]["name"] = cs_name
 
     path = os.path.join(os.getenv("HOME"), ".cache",
                         "cs", "status.json")
