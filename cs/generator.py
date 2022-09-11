@@ -18,33 +18,33 @@ def getColors(colors, img):
 
 def genColors(img):
     for i in range(0, 20, 1):
-        raw_colors = getColors(16 + i, img)
+        colors = getColors(16 + i, img)
 
-        if len(raw_colors) > 16:
+        if len(colors) > 16:
             break
 
         if i == 19:
-            logging.error("Imagemagick couldn't generate a suitable palette.")
+            logger.error("Imagemagick couldn't generate a suitable palette.")
             exit(1)
-    return raw_colors
+    return colors
 
 def adjustColors(colors, light):
-    raw_colors = colors[:1] + colors[8:16] + colors[8:-1]
+    colors = colors[:1] + colors[8:16] + colors[8:-1]
     if light:
         logger.info("Generating light colorscheme...")
-        for color in raw_colors:
-            color = saturate(color, 0.5)
-        raw_colors[0] = lighten(colors[-1], 0.85)
-        raw_colors[7] = colors[0]
-        raw_colors[8] = darken(colors[-1], 0.4)
-        raw_colors[15] = colors[0]
+        for color in colors:
+            color = saturate(color, 0.6)
+            color = darken(color, 0.5)
+        colors[0] = lighten(colors[-1], 0.95)
+        colors[7] = darken(colors[0], 0.75)
+        colors[8] = darken(colors[0], 0.25)
+        colors[15] = colors[7]
     else:
-        if raw_colors[0][1]!="0":
-            raw_colors[0] = darken(raw_colors[0], 0.40)
-        raw_colors[7] = blend(raw_colors[7], "#EEEEEE")
-        raw_colors[8] = darken(raw_colors[7], 0.30)
-        raw_colors[15] = blend(raw_colors[15], "#EEEEEE")
-    return raw_colors
+        colors[0] = darken(colors[0], 0.80)
+        colors[7] = lighten(colors[0], 0.75)
+        colors[8] = lighten(colors[0], 0.25)
+        colors[15] = colors[7]
+    return colors
 
 def build(colors):
     clrs = {}
@@ -54,12 +54,6 @@ def build(colors):
     for index,color in enumerate(colors[:-1]):
         clrs[f"color{index}"] = color
     return clrs
-
-def hex_to_rgb(color):
-    return tuple(bytes.fromhex(color.strip("#")))
-
-def rgb_to_hex(color):
-    return "#%02x%02x%02x" % (*color,)
 
 def darken(color, amount):
     color = [int(col * (1 - amount)) for col in hex_to_rgb(color)]
@@ -87,3 +81,9 @@ def saturate(color, amount):
     r, g, b = colorsys.hls_to_rgb(h, l, s)
     r, g, b = [x * 255.0 for x in (r, g, b)]
     return rgb_to_hex((int(r), int(g), int(b)))
+
+def hex_to_rgb(color):
+    return tuple(bytes.fromhex(color.strip("#")))
+
+def rgb_to_hex(color):
+    return "#%02x%02x%02x" % (*color,)

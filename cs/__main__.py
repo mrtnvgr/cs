@@ -75,7 +75,6 @@ class Main:
                 elif self.args.cmd in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
                     self.scheme = generator.gen(self.args.name, light=self.args.light)
-                    # TODO: genstatus light tag
                     self.setColorscheme()
                     self.genStatus(wallpaper=True)
                     self.currentScheme(name=False)
