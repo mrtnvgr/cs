@@ -10,6 +10,9 @@ class Namespace:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
+    def set(self, name, value):
+        self.__dict__.update(name=value)
+
 class Main:
     def __init__(self):
         self.getargs()
@@ -29,7 +32,7 @@ class Main:
             name = None
         else:
             name = args[2]
-        self.args = Namespace(cmd=args[1], name=name, light=light)
+        self.args = Namespace(cmd=args[1], name=name, light=light, path="")
 
     def setpaths(self):
         self.path_me = os.path.dirname(os.path.realpath(__file__))
@@ -70,13 +73,11 @@ class Main:
                 if self.args.cmd=="set":
                     self.scheme = self.getColorscheme()
                     self.setColorscheme()
-                    self.genStatus()
                     self.currentScheme()
                 elif self.args.cmd in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
                     self.scheme = generator.gen(self.args.name, light=self.args.light)
-                    self.setColorscheme()
-                    self.genStatus(wallpaper=True)
+                    self.setColorscheme(wallpaper=True)
                     self.currentScheme(name=False)
                 elif self.args.cmd in ("import","imp"):
                     imp = importer.Importer()
@@ -93,9 +94,11 @@ class Main:
                 logger.error("Unknown command or invalid usage")
                 exit(1)
 
-    def setColorscheme(self):
+    def setColorscheme(self, wallpaper=False):
         self.getFullColorScheme()
         self.generateTemplates()
+        status.gen(cs_name=self.args.name, light=self.args.light,
+                  cs_path=self.args.path, wallpaper=wallpaper)
         reload.reload_all()
 
     def getColorscheme(self):
@@ -103,7 +106,7 @@ class Main:
         for path in self.path_colorschemes:
             path = os.path.join(path, f"{self.args.name}.json")
             if os.path.exists(path):
-                self.scheme_path = path
+                self.args.set("path", path)
                 return json.load(open(path))
         logger.error(f"Unknown colorscheme: {self.args.name}")
         exit(1)
@@ -156,21 +159,6 @@ class Main:
         for file in sorted(files):
             if file.endswith(".json"):
                 print(f"    - {self.beautify(file)} ({file.removesuffix('.json')})")
-        
-    def genStatus(self, wallpaper=False):
-        path = os.path.join(os.getenv("HOME"), ".cache",
-                            "cs", "status.json")
-        status = {"source": {}, 
-                  "colorscheme": {"name": self.args.name, 
-                                  "light": self.args.light}}
-        
-        if wallpaper:
-            status["source"]["type"] = "wallpaper"
-            status["source"]["path"] = os.path.abspath(self.args.name)
-        else:
-            status["source"]["type"] = "colorscheme"
-            status["source"]["path"] = self.scheme_path
-        json.dump(status, open(path,"w"), indent=4)
 
     def currentScheme(self, name=True):
         logger.info("Current colorscheme: ", func_args={"end": ''})

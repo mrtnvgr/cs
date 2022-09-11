@@ -14,3 +14,19 @@ def get(path, string):
     else:
         logger.error("Status file doesnt exist")
         exit(1)
+
+def gen(cs_name, light, cs_path, wallpaper=False):
+    status = {"source": {}, 
+              "colorscheme": {"name": cs_name, 
+                              "light": light}}
+    
+    if wallpaper:
+        status["source"]["type"] = "wallpaper"
+        status["source"]["path"] = os.path.abspath(cs_path)
+    else:
+        status["source"]["type"] = "colorscheme"
+        status["source"]["path"] = cs_name 
+
+    path = os.path.join(os.getenv("HOME"), ".cache",
+                        "cs", "status.json")
+    json.dump(status, open(path, "w"), indent=4)
