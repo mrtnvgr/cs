@@ -1,6 +1,8 @@
-import subprocess, shutil, os
+import shutil, os
 from cs import sequences
+from cs import util
 from cs import logger
+import yaml
 
 def reload_all():
     logger.info("Reloading colors...")
@@ -9,11 +11,12 @@ def reload_all():
     reload_tty()
     sequences.send()
     reload_qtile()
+    reload_qutebrowser()
 
 def reload_termux():
     path = os.path.join(os.getenv("HOME"), ".termux")
     if os.path.exists(path):
-        subprocess.run(["termux-reload-settings"])
+        util.run(["termux-reload-settings"])
 
 def reload_xrdb():
     generated = os.path.join(os.getenv("HOME"), ".cache",
@@ -24,18 +27,14 @@ def reload_xrdb():
         files.append(user)
     if shutil.which("xrdb"):
         for file in files:
-            rc = subprocess.run(["xrdb", "-merge", "-quiet", file],
-                                 check=False,
-                                 stderr=subprocess.DEVNULL)
-        # if rc.returncode==1:
-        #     logger.warning("Xresources failed")
+            rc = util.run(["xrdb", "-merge", "-quiet", file])
 
 def reload_tty():
     path = os.path.join(os.getenv("HOME"), ".cache",
                         "cs", "colors-tty.sh")
     term = os.getenv("TERM")
     if term=="linux":
-        subprocess.run(["sh", path])
+        util.run(["sh", path])
 
 def reload_qtile():
     if shutil.which("qtile"):
@@ -43,5 +42,19 @@ def reload_qtile():
         if not shutil.which("pkill"):
             logger.warning("pkill not found??? trying killall...")
             cmd[0] = "killall"
-        subprocess.run(cmd, check=False,
-                       stderr=subprocess.DEVNULL)
+        util.run(cmd)
+
+def reload_qutebrowser():
+    if shutil.which("qutebrowser"):
+        template_path = os.path.join(os.getenv("HOME"), ".cache", "cs", "colors-qutebrowser.yml")
+        qutebrowser_path = os.path.join(os.getenv("HOME"), ".config", "qutebrowser", "autoconfig.yml")
+
+        if os.path.exists(template_path) and os.path.exists(qutebrowser_path):
+            colors = yaml.safe_load(open(template_path))
+            autoconfig = yaml.safe_load(open(qutebrowser_path))
+            for color in colors:
+                autoconfig["settings"][color] = {"global": colors[color]}
+            yaml.safe_dump(autoconfig, open(qutebrowser_path, "w"))
+
+            if util.pidof("qutebrowser"):
+                util.disown(["qutebrowser", ":config-source"])

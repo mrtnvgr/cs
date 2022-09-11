@@ -1,4 +1,5 @@
-import subprocess, colorsys, re
+import colorsys, re
+from cs import util
 from cs import logger
 
 def gen(img, light=False):
@@ -9,9 +10,8 @@ def getColors(colors, img):
     args = ["-resize", "25%", "-colors", str(colors),
             "-unique-colors", "txt:-"]
     try:
-        colors = subprocess.check_output(["convert", f"{img}[0]", *args], 
-                                          stderr=subprocess.DEVNULL).splitlines()
-    except subprocess.CalledProcessError:
+        colors = util.check_output(["convert", f"{img}[0]", *args]).splitlines()
+    except:
         logger.error(f"File {img} doesnt exist")
         exit(1)
     return [re.search("#.{6}", str(col)).group(0) for col in colors[1:]]
