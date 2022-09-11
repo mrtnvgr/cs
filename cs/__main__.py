@@ -6,13 +6,6 @@ from cs import reload
 from cs import logger
 import json, os, sys
 
-class Namespace:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
-
-    def set(self, name, value):
-        self.__dict__.update(name=value)
-
 class Main:
     def __init__(self):
         self.getargs()
@@ -32,7 +25,7 @@ class Main:
             name = None
         else:
             name = args[2]
-        self.args = Namespace(cmd=args[1], name=name, light=light, path="")
+        self.args = {"cmd": args[1], "name": name, "light": light}
 
     def setpaths(self):
         self.path_me = os.path.dirname(os.path.realpath(__file__))
@@ -53,42 +46,42 @@ class Main:
                     os.makedirs(fol, exist_ok=True)
 
     def cmds(self):
-        if self.args.cmd == "list":
+        if self.args["cmd"] == "list":
             self.listColorschemes()
-        elif self.args.cmd == "help":
+        elif self.args["cmd"] == "help":
             self.help()
-        elif self.args.cmd in ("reload", "rel"):
+        elif self.args["cmd"] in ("reload", "rel"):
             path = os.path.join(self.path_cache, "status.json")
             if os.path.exists(path):
                 reload.reload_all()
             else:
                 logger.error("Status file doesnt exist")
                 exit(1)
-        elif self.args.cmd in ("status", "stat"):
+        elif self.args["cmd"] in ("status", "stat"):
             path = os.path.join(self.path_cache, "status.json")
-            print(status.get(path, self.args.name))
+            print(status.get(path, self.args["name"]))
             exit(0)
         else:
-            if self.args.name!=None:
-                if self.args.cmd=="set":
+            if self.args["name"]!=None:
+                if self.args["cmd"]=="set":
                     self.scheme = self.getColorscheme()
                     self.setColorscheme()
                     self.currentScheme()
-                elif self.args.cmd in ("generate", "gen"):
+                elif self.args["cmd"] in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
-                    self.scheme = generator.gen(self.args.name, light=self.args.light)
+                    self.scheme = generator.gen(self.args["name"], light=self.args["light"])
                     self.setColorscheme(wallpaper=True)
                     self.currentScheme(name=False)
-                elif self.args.cmd in ("import","imp"):
+                elif self.args["cmd"] in ("import","imp"):
                     imp = importer.Importer()
-                    self.scheme = imp.importColorscheme(self.args.name)
+                    self.scheme = imp.importColorscheme(self.args["name"])
                     if self.scheme:
-                        if not self.args.name.endswith(".json"):
-                            if "." in self.args.name:
-                                self.args.name = self.args.name.split(".")[0]
-                            self.args.name += ".json"
+                        if not self.args["name"].endswith(".json"):
+                            if "." in self.args["name"]:
+                                self.args["name"] = self.args["name"].split(".")[0]
+                            self.args["name"] += ".json"
                         self.saveColorscheme()
-                elif self.args.cmd in ("delete","del"):
+                elif self.args["cmd"] in ("delete","del"):
                     self.deleteColorscheme()
             else:
                 logger.error("Unknown command or invalid usage")
@@ -97,18 +90,18 @@ class Main:
     def setColorscheme(self, wallpaper=False):
         self.getFullColorScheme()
         self.generateTemplates()
-        status.gen(cs_name=self.args.name, light=self.args.light,
-                  cs_path=self.args.path, wallpaper=wallpaper)
+        status.gen(cs_name=self.args["name"], light=self.args["light"],
+                   cs_path=self.args.get("path",""), wallpaper=wallpaper)
         reload.reload_all()
 
     def getColorscheme(self):
         logger.info("Getting colorscheme...")
         for path in self.path_colorschemes:
-            path = os.path.join(path, f"{self.args.name}.json")
+            path = os.path.join(path, f"{self.args['name']}.json")
             if os.path.exists(path):
-                self.args.set("path", path)
+                self.args["path"] = path
                 return json.load(open(path))
-        logger.error(f"Unknown colorscheme: {self.args.name}")
+        logger.error(f"Unknown colorscheme: {self.args['name']}")
         exit(1)
 
     def getFullColorScheme(self):
@@ -137,13 +130,13 @@ class Main:
 
     def saveColorscheme(self):
         path = os.path.join(self.path_config, "colorschemes",
-                            self.args.name)
+                            self.args["name"])
         json.dump(self.scheme, open(path, "w"), indent=4)
         logger.info(f"Colorscheme saved to {path}")
 
     def deleteColorscheme(self):
         for folder in self.path_colorschemes:
-            path = os.path.join(folder, f"{self.args.name}.json")
+            path = os.path.join(folder, f"{self.args['name']}.json")
             if os.path.exists(path):
                 ch = logger.warning(f"Delete: {path} (y/n): ", func=input).lower()
                 if ch=="y":
@@ -162,7 +155,7 @@ class Main:
 
     def currentScheme(self, name=True):
         logger.info("Current colorscheme: ", func_args={"end": ''})
-        if name: print(f"{self.beautify(self.args.name)}")
+        if name: print(f"{self.beautify(self.args['name'])}")
         self.colorPalette()
 
     def colorPalette(self):
