@@ -197,7 +197,11 @@ class Main:
         return color[1:]
 
 def main():
-    Main()
+    if sys.platform!="linux":
+        logger.error("Only for linux")
+        exit(1)
+    else:
+        Main()
 
 if __name__=="__main__":
     main()
