@@ -1,10 +1,10 @@
 #!/bin/python
-from cs import generator
+from cs import colorscheme
 from cs import thsave
 from cs import thload
-from cs import wallpaper
-from cs import status
 from cs import importer
+from cs import util
+from cs import status
 from cs import reload
 from cs import logger
 import json, os, sys
@@ -12,7 +12,7 @@ import json, os, sys
 class Main:
     def __init__(self):
         self.getargs()
-        self.setpaths()
+        self.paths = util.getPaths()
         self.cmds()
 
     def getargs(self):
@@ -29,24 +29,6 @@ class Main:
         else:
             name = args[2]
         self.args = {"cmd": args[1], "name": name, "light": light}
-
-    def setpaths(self):
-        self.path_me = os.path.dirname(os.path.realpath(__file__))
-        self.path_home = os.getenv("HOME")
-        self.path_config = os.path.join(self.path_home, ".config", "cs")
-        self.path_cache = os.path.join(self.path_home, ".cache", "cs")
-        self.path_colorschemes = (
-                os.path.join(self.path_config, "colorschemes"),
-                os.path.join(self.path_me, "colorschemes"))
-        for folder in (self.path_home,
-                       self.path_config,
-                       self.path_cache,
-                       self.path_colorschemes):
-            if type(folder)==str:
-                os.makedirs(folder, exist_ok=True)
-            else:
-                for fol in folder:
-                    os.makedirs(fol, exist_ok=True)
 
     def cmds(self):
         if self.args["cmd"] == "list":
@@ -67,14 +49,14 @@ class Main:
         else:
             if self.args["name"]!=None:
                 if self.args["cmd"]=="set":
-                    self.scheme = self.getColorscheme()
-                    self.setColorscheme()
+                    self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
+                    self.scheme.get()
+                    self.scheme.set()
                     self.currentScheme()
                 elif self.args["cmd"] in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
-                    self.scheme = generator.gen(self.args["name"], light=self.args["light"])
-                    wallpaper.set(self.args["name"])
-                    self.setColorscheme(wallpaper=True)
+                    self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
+                    self.scheme.generate()
                     self.currentScheme(name=False)
                 elif self.args["cmd"] in ("import","imp"):
                     imp = importer.Importer()
@@ -95,37 +77,6 @@ class Main:
             else:
                 logger.error("Unknown command or invalid usage")
                 exit(1)
-
-    def setColorscheme(self, wallpaper=False):
-        self.getFullColorScheme()
-        self.generateTemplates()
-        status.gen(cs_name=self.args["name"], light=self.args["light"],
-                   cs_path=self.args.get("path", self.args["name"]), wallpaper=wallpaper)
-        reload.reload_all()
-
-    def getColorscheme(self):
-        logger.info("Getting colorscheme...")
-        for path in self.path_colorschemes:
-            path = os.path.join(path, f"{self.args['name']}.json")
-            if os.path.exists(path):
-                self.args["path"] = path
-                return json.load(open(path))
-        logger.error(f"Unknown colorscheme: {self.args['name']}")
-        exit(1)
-
-    def getFullColorScheme(self):
-        for color in self.scheme.copy():
-            self.scheme[f"{color}_strip"] = self.scheme[color][1:]
-
-    def generateTemplates(self):
-        logger.info("Generating templates...")
-        templates_path = os.path.join(self.path_me, "templates")
-        for file in os.listdir(templates_path):
-            path = os.path.join(templates_path, file)
-            if not os.path.isdir(path):
-                template = open(path).read()
-                template = template.format(**self.scheme)
-                open(os.path.join(self.path_cache, file), "w").write(template)
 
     def saveColorscheme(self):
         path = os.path.join(self.path_config, "colorschemes",
