@@ -1,5 +1,6 @@
 #!/bin/python
 from cs import generator
+from cs import wallpaper
 from cs import status
 from cs import importer
 from cs import reload
@@ -70,6 +71,7 @@ class Main:
                 elif self.args["cmd"] in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
                     self.scheme = generator.gen(self.args["name"], light=self.args["light"])
+                    wallpaper.set(self.args["name"])
                     self.setColorscheme(wallpaper=True)
                     self.currentScheme(name=False)
                 elif self.args["cmd"] in ("import","imp"):
