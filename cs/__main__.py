@@ -1,6 +1,7 @@
 #!/bin/python
 from cs import generator
 from cs import thsave
+from cs import thload
 from cs import wallpaper
 from cs import status
 from cs import importer
@@ -84,9 +85,11 @@ class Main:
                                 self.args["name"] = self.args["name"].split(".")[0]
                             self.args["name"] += ".json"
                         self.saveColorscheme()
-                elif self.args["cmd"] in ("sav","save"):
+                elif self.args["cmd"] == "save":
                     status_path = os.path.join(self.path_cache, "status.json")
                     thsave.save(status_path, self.args["name"])
+                elif self.args["cmd"] == "load":
+                    thload.load(self.args["name"])
                 elif self.args["cmd"] in ("delete","del"):
                     self.deleteColorscheme()
             else:
@@ -167,13 +170,14 @@ class Main:
         print("cs {mode} {name}")
         print("    Modes:")
         print("        set {name} - set colorscheme")
-        print("        del (delete) {name} - delete colorscheme")
+        print("        del (delete) {name} - delete colorscheme") # TODO: themes support
         print("        gen (generate) {path} - generate colorscheme from wallpaper")
         print("        imp (import) {path} - import colorscheme from other formats")
-        print("        sav (save) {theme name} - save current current state")
+        print("        save {theme name} - save current theme")
+        print("        load {theme name} - load theme")
         print("        rel (reload) - reload templates")
         print("        stat (status) {.output.type} - print status element")
-        print("        list - print colorschemes")
+        print("        list - print colorschemes") # TODO: print themes
         print("        help - print help")
         print("    Optional arguments:")
         print("        -l (--light) - generate light colorscheme")
