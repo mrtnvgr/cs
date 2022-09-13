@@ -73,7 +73,8 @@ class Main:
                 elif self.args["cmd"] == "load":
                     thload.load(self.args["name"])
                 elif self.args["cmd"] in ("delete","del"):
-                    self.deleteColorscheme()
+                    self.deleteColorscheme("colorscheme", self.paths["colorschemes"])
+                    self.deleteColorscheme("theme", self.paths["themes"])
             else:
                 logger.error("Unknown command or invalid usage")
                 exit(1)
@@ -84,37 +85,43 @@ class Main:
         json.dump(self.scheme, open(path, "w"), indent=4)
         logger.info(f"Colorscheme saved to {path}")
 
-    def deleteColorscheme(self):
-        for folder in self.paths["colorschemes"]:
+    def deleteColorscheme(self, filetype, paths):
+        for folder in paths:
             path = os.path.join(folder, f"{self.args['name']}.json")
             if os.path.exists(path):
-                ch = logger.warning(f"Delete: {path} (y/n): ", func=input).lower()
+                ch = logger.warning(f"Delete {filetype}: {path} (y/n): ", func=input).lower()
                 if ch=="y":
                     os.remove(path)
 
     def listColorschemes(self):
-        files = []
-        for path in self.paths["colorschemes"]:
-            for file in os.listdir(path):
-                files.append(file)
+        for cpath, name in ((self.paths["colorschemes"], "Colorschemes: "),
+                            (self.paths["themes"], "Themes: ")):
+            files = []
+            if type(cpath) is str:
+                cpath = [cpath]
 
-        logger.info("Colorschemes: ")
-        for file in sorted(files):
-            if file.endswith(".json"):
-                print(f"    - {util.beautify(file)} ({file.removesuffix('.json')})")
+            for path in list(cpath):
+                for file in os.listdir(path):
+                    files.append(file)
+
+            if files!=[]:
+                logger.info(name)
+                for file in sorted(files):
+                    if file.endswith(".json"):
+                        print(f"    - {util.beautify(file)} ({file.removesuffix('.json')})")
 
     def help(self):
         print("cs {mode} {name}")
         print("    Modes:")
         print("        set {name} - set colorscheme")
-        print("        del (delete) {name} - delete colorscheme") # TODO: themes support
+        print("        del (delete) {name} - delete colorscheme/theme")
         print("        gen (generate) {path} - generate colorscheme from wallpaper")
         print("        imp (import) {path} - import colorscheme from other formats")
         print("        save {theme name} - save current theme")
         print("        load {theme name} - load theme")
         print("        rel (reload) - reload templates")
         print("        stat (status) {.output.type} - print status element")
-        print("        list - print colorschemes") # TODO: print themes
+        print("        list - print colorschemes/themes")
         print("        help - print help")
         print("    Optional arguments:")
         print("        -l (--light) - generate light colorscheme")

@@ -29,6 +29,7 @@ def getPaths():
     paths["cache"] = os.path.join(paths["home"], ".cache", "cs")
     paths["colorschemes"] = (os.path.join(paths["config"], "colorschemes"),
                              os.path.join(paths["me"], "colorschemes"))
+    paths["themes"] = os.path.join(paths["config"], "themes")
     for folder in list(paths.values()):
         if type(folder)==str:
             os.makedirs(folder, exist_ok=True)
