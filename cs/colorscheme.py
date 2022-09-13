@@ -49,3 +49,18 @@ class Colorscheme:
                 template = open(path).read()
                 template = template.format(**self.scheme)
                 open(os.path.join(self.paths["cache"], file), "w").write(template)
+
+    def currentScheme(self, name=True):
+        logger.info("Current colorscheme: ", func_args={"end": ''})
+        if name: print(f"{util.beautify(self.name)}")
+        self.colorPalette()
+    
+    @staticmethod
+    def colorPalette():
+        for i in range(0, 16):
+            if i % 8 == 0:
+                print()
+            if i > 7:
+                i = "8;5;%s" % i
+            print("\033[4%sm%s\033[0m" % (i, " "*4), end="")
+        print("\n")

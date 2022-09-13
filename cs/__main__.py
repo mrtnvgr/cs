@@ -36,14 +36,14 @@ class Main:
         elif self.args["cmd"] == "help":
             self.help()
         elif self.args["cmd"] in ("reload", "rel"):
-            path = os.path.join(self.path_cache, "status.json")
+            path = os.path.join(self.paths["cache"], "status.json")
             if os.path.exists(path):
                 reload.reload_all()
             else:
                 logger.error("Status file doesnt exist")
                 exit(1)
         elif self.args["cmd"] in ("status", "stat"):
-            path = os.path.join(self.path_cache, "status.json")
+            path = os.path.join(self.paths["cache"], "status.json")
             print(status.get(path, self.args["name"]))
             exit(0)
         else:
@@ -52,12 +52,12 @@ class Main:
                     self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
                     self.scheme.get()
                     self.scheme.set()
-                    self.currentScheme()
+                    self.scheme.currentScheme()
                 elif self.args["cmd"] in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
                     self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
                     self.scheme.generate()
-                    self.currentScheme(name=False)
+                    self.scheme.currentScheme(name=False)
                 elif self.args["cmd"] in ("import","imp"):
                     imp = importer.Importer()
                     self.scheme = imp.importColorscheme(self.args["name"])
@@ -68,7 +68,7 @@ class Main:
                             self.args["name"] += ".json"
                         self.saveColorscheme()
                 elif self.args["cmd"] == "save":
-                    status_path = os.path.join(self.path_cache, "status.json")
+                    status_path = os.path.join(self.paths["cache"], "status.json")
                     thsave.save(status_path, self.args["name"])
                 elif self.args["cmd"] == "load":
                     thload.load(self.args["name"])
@@ -79,13 +79,13 @@ class Main:
                 exit(1)
 
     def saveColorscheme(self):
-        path = os.path.join(self.path_config, "colorschemes",
+        path = os.path.join(self.paths["config"], "colorschemes",
                             self.args["name"])
         json.dump(self.scheme, open(path, "w"), indent=4)
         logger.info(f"Colorscheme saved to {path}")
 
     def deleteColorscheme(self):
-        for folder in self.path_colorschemes:
+        for folder in self.paths["colorschemes"]:
             path = os.path.join(folder, f"{self.args['name']}.json")
             if os.path.exists(path):
                 ch = logger.warning(f"Delete: {path} (y/n): ", func=input).lower()
@@ -94,28 +94,14 @@ class Main:
 
     def listColorschemes(self):
         files = []
-        for path in self.path_colorschemes:
+        for path in self.paths["colorschemes"]:
             for file in os.listdir(path):
                 files.append(file)
 
         logger.info("Colorschemes: ")
         for file in sorted(files):
             if file.endswith(".json"):
-                print(f"    - {self.beautify(file)} ({file.removesuffix('.json')})")
-
-    def currentScheme(self, name=True):
-        logger.info("Current colorscheme: ", func_args={"end": ''})
-        if name: print(f"{self.beautify(self.args['name'])}")
-        self.colorPalette()
-
-    def colorPalette(self):
-        for i in range(0, 16):
-            if i % 8 == 0:
-                print()
-            if i > 7:
-                i = "8;5;%s" % i
-            print("\033[4%sm%s\033[0m" % (i, " "*4), end="")
-        print("\n")
+                print(f"    - {util.beautify(file)} ({file.removesuffix('.json')})")
 
     def help(self):
         print("cs {mode} {name}")
@@ -133,16 +119,6 @@ class Main:
         print("    Optional arguments:")
         print("        -l (--light) - generate light colorscheme")
         exit(0)
-
-    @staticmethod
-    def beautify(text):
-        text = text.removesuffix(".json")
-        if "_" in text:
-            text = text.replace("_", " ")
-        else:
-            if "-" in text:
-                text = text.replace("_", " ")
-        return text.title()
 
     @staticmethod
     def strip(color):

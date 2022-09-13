@@ -16,20 +16,27 @@ def get(path, string):
         exit(1)
 
 def gen(cs_name, light, cs_path, wallpaper=False):
-    status = {"source": {"path": os.path.abspath(cs_path)}, 
-              "colorscheme": {"name": cs_name, 
-                              "light": light}}
+    path = os.path.join(os.getenv("HOME"), ".cache",
+                        "cs", "status.json")
+    status = {"colorscheme": {"name": cs_name,
+                              "light": light,
+                              "path": os.path.abspath(cs_path)}}
+
+    # Get wallpaper value from old status
+    if os.path.exists(path):
+        old_status = json.load(open(path))
+        if "wallpaper" in old_status: 
+            status["wallpaper"] = old_status["wallpaper"]
     
     if wallpaper:
-        status["source"]["type"] = "wallpaper"
-        name = os.path.basename(status["source"]["path"])
+        status["wallpaper"] = status["colorscheme"]["path"]
+        status["colorscheme"]["type"] = "wallpaper"
+        name = os.path.basename(status["colorscheme"]["path"])
         if "." in name:
             name = ''.join(name.split(".")[:-1])
         status["colorscheme"]["name"] = name
     else:
-        status["source"]["type"] = "colorscheme"
+        status["colorscheme"]["type"] = "colorscheme"
         status["colorscheme"]["name"] = cs_name
 
-    path = os.path.join(os.getenv("HOME"), ".cache",
-                        "cs", "status.json")
     json.dump(status, open(path, "w"), indent=4)

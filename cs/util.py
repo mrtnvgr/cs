@@ -36,3 +36,12 @@ def getPaths():
             for fol in folder:
                 os.makedirs(fol, exist_ok=True)
     return paths
+
+def beautify(text):
+    text = text.removesuffix(".json")
+    if "_" in text:
+        text = text.replace("_", " ")
+    else:
+        if "-" in text:
+            text = text.replace("_", " ")
+    return text.title()
