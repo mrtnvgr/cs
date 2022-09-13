@@ -14,8 +14,11 @@ def reload_all():
     reload_qutebrowser()
 
 def reload_termux():
-    path = os.path.join(os.getenv("HOME"), ".termux")
-    if os.path.exists(path):
+    termux_path = os.path.join(os.getenv("HOME"), ".termux")
+    if os.path.exists(termux_path):
+        colors_path = os.path.join(os.getenv("HOME"), ".cache",
+                                   "cs", "colors.termux")
+        shutil.copy2(colors_path, os.path.join(termux_path, "colors.properties"))
         util.run(["termux-reload-settings"])
 
 def reload_xrdb():
@@ -27,7 +30,7 @@ def reload_xrdb():
         files.append(user)
     if shutil.which("xrdb"):
         for file in files:
-            rc = util.run(["xrdb", "-merge", "-quiet", file])
+            util.run(["xrdb", "-merge", "-quiet", file])
 
 def reload_tty():
     path = os.path.join(os.getenv("HOME"), ".cache",

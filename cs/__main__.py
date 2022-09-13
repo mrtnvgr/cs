@@ -117,16 +117,6 @@ class Main:
                 template = open(path).read()
                 template = template.format(**self.scheme)
                 open(os.path.join(self.path_cache, file), "w").write(template)
-        self.generateOptionalTemplates()
-
-    def generateOptionalTemplates(self):
-        path = os.path.join(self.path_home, ".termux")
-        if os.path.exists(path):
-            path = os.path.join(path, "colors.properties")
-            template = open(os.path.join(self.path_me, "templates",
-                                         "optional",
-                                         "colors.termux")).read()
-            open(path, "w").write(template.format(**self.scheme))
 
     def saveColorscheme(self):
         path = os.path.join(self.path_config, "colorschemes",
