@@ -24,14 +24,14 @@ def reload_termux():
 def reload_xrdb():
     generated = os.path.join(os.getenv("HOME"), ".cache",
                              "cs", "colors.Xresources")
-    files = [generated]
     user = os.path.join(os.getenv("HOME"), ".Xresources")
-    if os.path.exists(user):
-        files.append(user)
+    files = [generated, user]
+
     if os.environ.get("DISPLAY"): # check if Xorg is running
         if shutil.which("xrdb"):
             for file in files:
-                util.run(["xrdb", "-merge", "-quiet", file])
+                if os.path.exists(file):
+                    util.run(["xrdb", "-merge", "-quiet", file])
 
 def reload_tty():
     path = os.path.join(os.getenv("HOME"), ".cache",
