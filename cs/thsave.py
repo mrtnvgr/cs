@@ -24,8 +24,11 @@ def save(cache_path, name):
         theme_wallpaper_path = os.path.join(theme_path, wallpaper_name)
         shutil.copy2(status["wallpaper"], theme_wallpaper_path)
         
-        # Change wallpaper value in theme status
+        # Change wallpaper value
         status["wallpaper"] = wallpaper_name
+
+        # Change colorscheme name to theme name
+        status["colorscheme"]["name"] = name
         
         # Save status
         json.dump(status, open(theme_status_path, "w"), indent=4)

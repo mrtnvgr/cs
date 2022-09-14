@@ -5,7 +5,7 @@ from cs import thsave
 from cs import thload
 from cs import importer
 from cs import util
-from cs import status
+from cs import status as cs_status
 from cs import reload
 from cs import logger
 
@@ -44,7 +44,7 @@ class Main:
                 exit(1)
         elif self.args["cmd"] in ("status", "stat"):
             path = os.path.join(self.paths["cache"], "status.json")
-            print(status.get(path, self.args["name"]))
+            print(cs_status.get(path, self.args["name"]))
             exit(0)
         else:
             if self.args["name"]!=None:
