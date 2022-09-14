@@ -1,5 +1,5 @@
 #!/bin/python
-import json, shutil, os, sys
+import json, imghdr, shutil, os, sys
 from cs import colorscheme
 from cs import thsave
 from cs import thload
@@ -49,10 +49,13 @@ class Main:
         else:
             if self.args["name"]!=None:
                 if self.args["cmd"]=="set":
-                    self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
-                    self.scheme.get()
-                    self.scheme.set()
-                    self.scheme.currentScheme()
+                    if imghdr.what(self.args["name"])==None:
+                        self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
+                        self.scheme.get()
+                        self.scheme.set()
+                        self.scheme.currentScheme()
+                    else:
+                        colorscheme.wallpaper.set(self.args["name"])
                 elif self.args["cmd"] in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
                     self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
@@ -112,12 +115,13 @@ class Main:
                 logger.info(name)
                 for file in sorted(files):
                     if file.endswith(".json"):
-                        print(f"    - {util.beautify(file)} ({file.removesuffix('.json')})")
+                        file = file.removesuffix(".json")
+                    print(f"    - {util.beautify(file)} ({file})")
 
     def help(self):
         print("cs {mode} {name}")
         print("    Modes:")
-        print("        set {name} - set colorscheme")
+        print("        set {name} - set colorscheme/theme/wallpaper")
         print("        del (delete) {name} - delete colorscheme/theme")
         print("        gen (generate) {path} - generate colorscheme from wallpaper")
         print("        imp (import) {path} - import colorscheme from other formats")
