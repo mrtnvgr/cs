@@ -28,9 +28,10 @@ def reload_xrdb():
     user = os.path.join(os.getenv("HOME"), ".Xresources")
     if os.path.exists(user):
         files.append(user)
-    if shutil.which("xrdb"):
-        for file in files:
-            util.run(["xrdb", "-merge", "-quiet", file])
+    if os.environ.get("DISPLAY"): # check if Xorg is running
+        if shutil.which("xrdb"):
+            for file in files:
+                util.run(["xrdb", "-merge", "-quiet", file])
 
 def reload_tty():
     path = os.path.join(os.getenv("HOME"), ".cache",
