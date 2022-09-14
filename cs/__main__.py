@@ -1,4 +1,5 @@
 #!/bin/python
+import json, shutil, os, sys
 from cs import colorscheme
 from cs import thsave
 from cs import thload
@@ -7,7 +8,6 @@ from cs import util
 from cs import status
 from cs import reload
 from cs import logger
-import json, os, sys
 
 class Main:
     def __init__(self):
@@ -68,8 +68,8 @@ class Main:
                             self.args["name"] += ".json"
                         self.saveColorscheme()
                 elif self.args["cmd"] == "save":
-                    status_path = os.path.join(self.paths["cache"], "status.json")
-                    thsave.save(status_path, self.args["name"])
+                    cache_path = os.path.join(self.paths["cache"])
+                    thsave.save(cache_path, self.args["name"])
                 elif self.args["cmd"] == "load":
                     thload.load(self.args["name"])
                 elif self.args["cmd"] in ("delete","del"):
@@ -87,11 +87,15 @@ class Main:
 
     def deleteColorscheme(self, filetype, paths):
         for folder in paths:
-            path = os.path.join(folder, f"{self.args['name']}.json")
-            if os.path.exists(path):
-                ch = logger.warning(f"Delete {filetype}: {path} (y/n): ", func=input).lower()
+            path = os.path.join(folder, f"{self.args['name']}")
+            if os.path.exists(path) or os.path.exists(f"{path}.json"):
+                name = os.path.basename(path)
+                ch = logger.warning(f"Delete {filetype}: {name} (y/n): ", func=input).lower()
                 if ch=="y":
-                    os.remove(path)
+                    if os.path.isfile(path):
+                        os.remove(path)
+                    else:
+                        shutil.rmtree(path)
 
     def listColorschemes(self):
         for cpath, name in ((self.paths["colorschemes"], "Colorschemes: "),
