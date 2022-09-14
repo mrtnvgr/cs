@@ -49,13 +49,18 @@ class Main:
         else:
             if self.args["name"]!=None:
                 if self.args["cmd"]=="set":
-                    if imghdr.what(self.args["name"])==None:
+                    if os.path.exists(self.args["name"]) and imghdr.what(self.args["name"])!=None:
+                        colorscheme.wallpaper.set(self.args["name"])
+                        status_path = os.path.join(self.paths["cache"], "status.json")
+                        if os.path.exists(status_path):
+                            status = json.load(open(status_path))
+                            status["wallpaper"] = self.args["name"]
+                            json.dump(status, open(status_path, "w"), indent=4)
+                    else:
                         self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
                         self.scheme.get()
                         self.scheme.set()
                         self.scheme.currentScheme()
-                    else:
-                        colorscheme.wallpaper.set(self.args["name"])
                 elif self.args["cmd"] in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
                     self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
@@ -89,8 +94,10 @@ class Main:
         logger.info(f"Colorscheme saved to {path}")
 
     def deleteColorscheme(self, filetype, paths):
+        if type(paths) is str:
+            paths = [paths]
         for folder in paths:
-            path = os.path.join(folder, f"{self.args['name']}")
+            path = os.path.join(folder, self.args['name'])
             if os.path.exists(path) or os.path.exists(f"{path}.json"):
                 name = os.path.basename(path)
                 ch = logger.warning(f"Delete {filetype}: {name} (y/n): ", func=input).lower()
