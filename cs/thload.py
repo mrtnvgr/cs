@@ -20,7 +20,7 @@ def load(theme_name):
         reload.reload_all()
         
         if "wallpaper" in theme:
-            wallpaper.set(theme["wallpaper"])
+            wallpaper.set(os.path.join(theme_path, theme["wallpaper"]))
 
     else:
         logger.error(f"{theme_name} does not exist")

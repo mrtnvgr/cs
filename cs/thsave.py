@@ -1,4 +1,4 @@
-import shutil, os
+import shutil, json, os
 from cs import logger
 
 def save(cache_path, name):
@@ -15,4 +15,19 @@ def save(cache_path, name):
                 exit(1)
         shutil.copytree(cache_path, theme_path)
         
+        # Load status
+        theme_status_path = os.path.join(theme_path, "status.json")
+        status = json.load(open(theme_status_path))
+        
+        # Copy wallpaper into theme directory
+        wallpaper_name = os.path.basename(status["wallpaper"])
+        theme_wallpaper_path = os.path.join(theme_path, wallpaper_name)
+        shutil.copy2(status["wallpaper"], theme_wallpaper_path)
+        
+        # Change wallpaper value in theme status
+        status["wallpaper"] = wallpaper_name
+        
+        # Save status
+        json.dump(status, open(theme_status_path, "w"), indent=4)
+
         logger.info(f"Current state saved as {name} to {theme_path}")
