@@ -7,7 +7,11 @@ def get(path, string):
         if string!=None and string!=".":
             for elem in string.split("."):
                 if elem!="":
-                    status = status[elem]
+                    if elem in status:
+                        status = status[elem]
+                    else:
+                        logger.error(f"Status does not contain '{elem}' key")
+                        exit(1)
         if type(status) is dict:
             status = json.dumps(status, indent=4)
         return status
