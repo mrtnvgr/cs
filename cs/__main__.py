@@ -128,11 +128,11 @@ class Main:
     def help(self):
         print("cs {mode} {name}")
         print("    Modes:")
-        print("        set {name} - set colorscheme/theme/wallpaper")
+        print("        set {name} - set colorscheme/wallpaper")
         print("        del (delete) {name} - delete colorscheme/theme")
         print("        gen (generate) {path} - generate colorscheme from wallpaper")
         print("        imp (import) {path} - import colorscheme from other formats")
-        print("        save {theme name} - save current theme")
+        print("        save {theme name} - save theme")
         print("        load {theme name} - load theme")
         print("        rel (reload) - reload templates")
         print("        stat (status) {.output.type} - print status element")
