@@ -1,10 +1,11 @@
 import shutil, imghdr, json, os
 from cs import logger
+from cs import util
 
-def save(cache_path, name):
-    status_path = os.path.join(cache_path, "status.json")
+def save(name):
+    status_path = os.path.join(util.paths["cache"], "status.json")
     if os.path.exists(status_path):
-        theme_path = os.path.join(os.getenv("HOME"), ".config", "cs", "themes", name)
+        theme_path = os.path.join(util.paths["themes"], name)
         
         if os.path.exists(theme_path):
             logger.warning(f"Theme {name} already exists")
@@ -15,15 +16,15 @@ def save(cache_path, name):
                 exit(1)
 
         # Load status
-        status = json.load(open(os.path.join(cache_path, "status.json")))
+        status = json.load(open(status_path))
         
         # Make theme directory
         os.makedirs(theme_path)
 
         # Copying files
-        cache_files = os.listdir(cache_path)
+        cache_files = os.listdir(util.paths["cache"])
         for file in cache_files:
-            path = os.path.join(cache_path, file)
+            path = os.path.join(util.paths["cache"], file)
             if imghdr.what(path)!=None: # if file is image
                 if file!=status["wallpaper"]: # if file is not theme wallpaper
                     os.remove(path) # cleaning old file

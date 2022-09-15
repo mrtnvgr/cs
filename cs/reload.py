@@ -14,17 +14,15 @@ def reload_all():
     reload_qutebrowser()
 
 def reload_termux():
-    termux_path = os.path.join(os.getenv("HOME"), ".termux")
+    termux_path = os.path.join(util.paths["home"], ".termux")
     if os.path.exists(termux_path):
-        colors_path = os.path.join(os.getenv("HOME"), ".cache",
-                                   "cs", "colors.termux")
+        colors_path = os.path.join(util.paths["cache"], "colors.termux")
         shutil.copy2(colors_path, os.path.join(termux_path, "colors.properties"))
         util.run(["termux-reload-settings"])
 
 def reload_xrdb():
-    generated = os.path.join(os.getenv("HOME"), ".cache",
-                             "cs", "colors.Xresources")
-    user = os.path.join(os.getenv("HOME"), ".Xresources")
+    generated = os.path.join(util.paths["cache"], "colors.Xresources")
+    user = os.path.join(util.paths["home"], ".Xresources")
     files = [generated, user]
 
     if os.environ.get("DISPLAY"): # check if Xorg is running
@@ -34,8 +32,7 @@ def reload_xrdb():
                     util.run(["xrdb", "-merge", "-quiet", file])
 
 def reload_tty():
-    path = os.path.join(os.getenv("HOME"), ".cache",
-                        "cs", "colors-tty.sh")
+    path = os.path.join(util.paths["cache"], "colors-tty.sh")
     term = os.getenv("TERM")
     if term=="linux":
         util.run(["sh", path])
@@ -50,8 +47,8 @@ def reload_qtile():
 
 def reload_qutebrowser():
     if shutil.which("qutebrowser"):
-        template_path = os.path.join(os.getenv("HOME"), ".cache", "cs", "colors-qutebrowser.yml")
-        qutebrowser_path = os.path.join(os.getenv("HOME"), ".config", "qutebrowser", "autoconfig.yml")
+        template_path = os.path.join(util.paths["cache"], "colors-qutebrowser.yml")
+        qutebrowser_path = os.path.join(util.paths["home"], ".config", "qutebrowser", "autoconfig.yml")
 
         if os.path.exists(template_path) and os.path.exists(qutebrowser_path):
             colors = yaml.safe_load(open(template_path))

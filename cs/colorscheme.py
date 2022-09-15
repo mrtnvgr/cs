@@ -11,11 +11,10 @@ class Colorscheme:
         self.name = name
         self.path = name
         self.light = light
-        self.paths = util.getPaths()
 
     def get(self):
         logger.info("Getting colorscheme...")
-        for path in self.paths["colorschemes"]:
+        for path in util.paths["colorschemes"]:
             path = os.path.join(path, f"{self.name}.json")
             if os.path.exists(path):
                 self.path = path
@@ -42,13 +41,13 @@ class Colorscheme:
 
     def generateTemplates(self):
         logger.info("Generating templates...")
-        templates_path = os.path.join(self.paths["me"], "templates")
+        templates_path = os.path.join(util.paths["me"], "templates")
         for file in os.listdir(templates_path):
             path = os.path.join(templates_path, file)
             if not os.path.isdir(path):
                 template = open(path).read()
                 template = template.format(**self.scheme)
-                open(os.path.join(self.paths["cache"], file), "w").write(template)
+                open(os.path.join(util.paths["cache"], file), "w").write(template)
 
     def currentScheme(self, name=True):
         logger.info("Current colorscheme: ", func_args={"end": ''})

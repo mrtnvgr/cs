@@ -1,6 +1,7 @@
 import platform, json, glob, os
 from pathlib import Path
 from cs import logger
+from cs import util
 
 def set_special(index, color, iterm_name="h", alpha=100):
     if platform.system == "Darwin" and iterm_name:
@@ -44,8 +45,7 @@ def create_sequences(colors, vte_fix=False):
 
 
 def send(to_send=True, vte_fix=False):
-    cache_dir = os.path.join(os.getenv("HOME"), ".cache", "cs")
-    colors = json.load(open(os.path.join(cache_dir, "colors.json")))
+    colors = json.load(open(os.path.join(util.paths["cache"], "colors.json")))
     if platform.system == "Darwin":
         tty_pattern = "/dev/ttys00[0-9]*"
     else:
@@ -64,5 +64,5 @@ def send(to_send=True, vte_fix=False):
                 group = path.group()
                 logger.warning(f"Permission denied: {p.filename} is owned by {owner}:{group}")
     
-    with open(os.path.join(cache_dir, "sequences"), "w") as file:
+    with open(os.path.join(util.paths["cache"], "sequences"), "w") as file:
         file.write(sequences)

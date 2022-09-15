@@ -1,5 +1,6 @@
 import os, json
 from cs import logger
+from cs import util
 
 def get(path, string):
     if os.path.exists(path):
@@ -20,8 +21,7 @@ def get(path, string):
         exit(1)
 
 def gen(cs_name, light, cs_path, wallpaper=False):
-    path = os.path.join(os.getenv("HOME"), ".cache",
-                        "cs", "status.json")
+    path = os.path.join(util.paths["cache"], "status.json")
     status = {"colorscheme": {"name": cs_name,
                               "light": light,
                               "path": os.path.abspath(cs_path)}}

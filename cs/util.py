@@ -1,5 +1,14 @@
 import subprocess, os
 
+paths = {}
+paths["me"] = os.path.dirname(os.path.realpath(__file__))
+paths["home"] = os.getenv("HOME")
+paths["config"] = os.path.join(paths["home"], ".config", "cs")
+paths["cache"] = os.path.join(paths["home"], ".cache", "cs")
+paths["colorschemes"] = (os.path.join(paths["config"], "colorschemes"),
+                         os.path.join(paths["me"], "colorschemes"))
+paths["themes"] = os.path.join(paths["config"], "themes")
+
 def run(cmd):
     return subprocess.run(cmd,
                           check=False,
@@ -21,15 +30,7 @@ def pidof(name):
         return False
     return True
 
-def getPaths():
-    paths = {}
-    paths["me"] = os.path.dirname(os.path.realpath(__file__))
-    paths["home"] = os.getenv("HOME")
-    paths["config"] = os.path.join(paths["home"], ".config", "cs")
-    paths["cache"] = os.path.join(paths["home"], ".cache", "cs")
-    paths["colorschemes"] = (os.path.join(paths["config"], "colorschemes"),
-                             os.path.join(paths["me"], "colorschemes"))
-    paths["themes"] = os.path.join(paths["config"], "themes")
+def setupPaths():
     for folder in list(paths.values()):
         if type(folder)==str:
             os.makedirs(folder, exist_ok=True)

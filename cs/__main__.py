@@ -12,7 +12,7 @@ from cs import logger
 class Main:
     def __init__(self):
         self.getargs()
-        self.paths = util.getPaths()
+        util.setupPaths()
         self.cmds()
 
     def getargs(self):
@@ -36,14 +36,14 @@ class Main:
         elif self.args["cmd"] == "help":
             self.help()
         elif self.args["cmd"] in ("reload", "rel"):
-            path = os.path.join(self.paths["cache"], "status.json")
+            path = os.path.join(util.paths["cache"], "status.json")
             if os.path.exists(path):
                 reload.reload_all()
             else:
                 logger.error("Status file doesnt exist")
                 exit(1)
         elif self.args["cmd"] in ("status", "stat"):
-            path = os.path.join(self.paths["cache"], "status.json")
+            path = os.path.join(util.paths["cache"], "status.json")
             print(cs_status.get(path, self.args["name"]))
             exit(0)
         else:
@@ -51,7 +51,7 @@ class Main:
                 if self.args["cmd"]=="set":
                     if os.path.exists(self.args["name"]) and imghdr.what(self.args["name"])!=None:
                         colorscheme.wallpaper.set(self.args["name"])
-                        status_path = os.path.join(self.paths["cache"], "status.json")
+                        status_path = os.path.join(util.paths["cache"], "status.json")
                         if os.path.exists(status_path):
                             status = json.load(open(status_path))
                             status["wallpaper"] = self.args["name"]
@@ -76,19 +76,18 @@ class Main:
                             self.args["name"] += ".json"
                         self.saveColorscheme()
                 elif self.args["cmd"] == "save":
-                    cache_path = os.path.join(self.paths["cache"])
-                    thsave.save(cache_path, self.args["name"])
+                    thsave.save(self.args["name"])
                 elif self.args["cmd"] == "load":
                     thload.load(self.args["name"])
                 elif self.args["cmd"] in ("delete","del"):
-                    self.deleteColorscheme("colorscheme", self.paths["colorschemes"])
-                    self.deleteColorscheme("theme", self.paths["themes"])
+                    self.deleteColorscheme("colorscheme", util.paths["colorschemes"])
+                    self.deleteColorscheme("theme", util.paths["themes"])
             else:
                 logger.error("Unknown command or invalid usage")
                 exit(1)
 
     def saveColorscheme(self):
-        path = os.path.join(self.paths["config"], "colorschemes",
+        path = os.path.join(util.paths["config"], "colorschemes",
                             self.args["name"])
         json.dump(self.scheme, open(path, "w"), indent=4)
         logger.info(f"Colorscheme saved to {path}")
@@ -108,8 +107,8 @@ class Main:
                         shutil.rmtree(path)
 
     def listColorschemes(self):
-        for cpath, name in ((self.paths["colorschemes"], "Colorschemes: "),
-                            (self.paths["themes"], "Themes: ")):
+        for cpath, name in ((util.paths["colorschemes"], "Colorschemes: "),
+                            (util.paths["themes"], "Themes: ")):
             files = []
             if type(cpath) is str:
                 cpath = [cpath]
