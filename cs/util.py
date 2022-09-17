@@ -1,5 +1,6 @@
 import subprocess, requests, os
 
+# Generate paths dict
 paths = {}
 paths["me"] = os.path.dirname(os.path.realpath(__file__))
 paths["home"] = os.getenv("HOME")
@@ -31,6 +32,7 @@ def pidof(name):
     return True
 
 def setupPaths():
+    """ Create path dirs if they dont exist """
     for folder in list(paths.values()):
         if type(folder)==str:
             os.makedirs(folder, exist_ok=True)
@@ -40,6 +42,7 @@ def setupPaths():
     return paths
 
 def beautify(text):
+    """ Beautify text """
     text = text.removesuffix(".json")
     if "_" in text:
         text = text.replace("_", " ")

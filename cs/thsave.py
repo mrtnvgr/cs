@@ -3,14 +3,20 @@ from cs import logger
 from cs import util
 
 def save(name):
+    """ Save current state to theme """
+    
     status_path = os.path.join(util.paths["cache"], "status.json")
+    # If status exists
     if os.path.exists(status_path):
         theme_path = os.path.join(util.paths["themes"], name)
         
+        # Ask user to overwrite if theme already exists
         if os.path.exists(theme_path):
             logger.warning(f"Theme {name} already exists")
             ch = logger.warning("Overwrite? (y/n): ", func=input).lower()
+
             if ch == "y":
+                # Remove old theme folder
                 shutil.rmtree(theme_path)
             else:
                 exit(1)
