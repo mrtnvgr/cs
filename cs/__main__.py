@@ -88,7 +88,7 @@ class Main:
 
     def saveColorscheme(self):
         path = os.path.join(util.paths["config"], "colorschemes",
-                            self.args["name"])
+                            os.path.basename(self.args["name"]))
         json.dump(self.scheme, open(path, "w"), indent=4)
         logger.info(f"Colorscheme saved to {path}")
 

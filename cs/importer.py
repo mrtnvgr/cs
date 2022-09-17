@@ -35,8 +35,12 @@ class Importer:
                                         elems.remove(elem)
                                         break
                 if elems!=[]:
-                    logger.error("Enough colors not found")
-                    exit(1)
+                    if "cursor" not in elems and "foreground" in self.scheme:
+                        logger.error("Enough colors not found")
+                        exit(1)
+                    else:
+                        self.scheme["cursor"] = self.scheme["foreground"]
+
             if self.scheme!={}: return self.scheme
         logger.error(f"File {name} doesnt exist")
         exit(1)
