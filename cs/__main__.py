@@ -118,11 +118,13 @@ class Main:
                     files.append(file)
 
             if files!=[]:
+                print()
                 logger.info(name)
                 for file in sorted(files):
                     if file.endswith(".json"):
                         file = file.removesuffix(".json")
                     print(f"    - {util.beautify(file)} ({file})")
+        print()
 
     def help(self):
         print("cs {mode} {name}")
