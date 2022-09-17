@@ -1,4 +1,4 @@
-import subprocess, os
+import subprocess, requests, os
 
 paths = {}
 paths["me"] = os.path.dirname(os.path.realpath(__file__))
@@ -47,3 +47,12 @@ def beautify(text):
         if "-" in text:
             text = text.replace("_", " ")
     return text.title()
+
+def isUrl(text):
+    """ Check if text is url """
+    return True if "http" in text and "://" in text else False
+
+def downloadUrl(url, path):
+    """ Download url """
+    content = requests.get(url).content
+    open(path, "wb").write(content)

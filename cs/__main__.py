@@ -49,7 +49,10 @@ class Main:
         else:
             if self.args["name"]!=None:
                 if self.args["cmd"]=="set":
-                    if os.path.exists(self.args["name"]) and imghdr.what(self.args["name"])!=None:
+                    wallpaper = os.path.exists(self.args["name"]) and imghdr.what(self.args["name"])!=None
+                    url = util.isUrl(self.args["name"])
+
+                    if wallpaper or url:
                         colorscheme.wallpaper.set(self.args["name"])
                         status_path = os.path.join(util.paths["cache"], "status.json")
                         if os.path.exists(status_path):
@@ -61,6 +64,7 @@ class Main:
                         self.scheme.get()
                         self.scheme.set()
                         self.scheme.currentScheme()
+
                 elif self.args["cmd"] in ("generate", "gen"):
                     logger.info("Generating colors from wallpaper...")
                     self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
@@ -129,7 +133,7 @@ class Main:
     def help(self):
         print("cs {mode} {name}")
         print("    Modes:")
-        print("        set {name} - set colorscheme/wallpaper")
+        print("        set {name} - set colorscheme/wallpaper/wallpaper url")
         print("        del (delete) {name} - delete colorscheme/theme")
         print("        gen (generate) {path} - generate colorscheme from wallpaper")
         print("        imp (import) {path} - import colorscheme from other formats")
