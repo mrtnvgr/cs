@@ -24,7 +24,7 @@ def gen(cs_name, light, cs_path, wallpaper=False):
     path = os.path.join(util.paths["cache"], "status.json")
     status = {"colorscheme": {"name": cs_name,
                               "light": light,
-                              "path": os.path.abspath(cs_path)}}
+                              "path": cs_path}}
 
     # Get wallpaper value from old status
     if os.path.exists(path):

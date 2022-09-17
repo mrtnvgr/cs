@@ -10,7 +10,8 @@ def set(path):
     """ Set wallpaper """
     
     # If path is url, download file
-    if util.isUrl(path):
+    isurl = util.isUrl(path)
+    if isurl:
         
         logger.info("Downloading wallpaper...")
 
@@ -39,12 +40,12 @@ def set(path):
             if shutil.which("feh"):
                 
                 util.run(["feh", "--bg-fill", path])
-                current(path)
+                current(path, isurl)
             
             else:
                 logger.warning(f"Your wallpaper manager is not supported")
 
-def current(path):
+def current(path, isurl):
     """ Print current wallpaper info """
     name = os.path.basename(path)
-    logger.info(f"Current wallpaper is {name}")
+    if not isurl: logger.info(f"Current wallpaper is {name}")
