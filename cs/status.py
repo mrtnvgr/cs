@@ -52,16 +52,32 @@ def gen(cs_name, light, cs_path, wallpaper=False):
         old_status = json.load(open(path))
         if "wallpaper" in old_status: 
             status["wallpaper"] = old_status["wallpaper"]
-    
+
+    # If colorscheme is wallpaper generated
     if wallpaper:
+
+        # Overwrite colorscheme path with wallpaper path
         status["wallpaper"] = status["colorscheme"]["path"]
+
+        # Set wallpaper as colorscheme type
         status["colorscheme"]["type"] = "wallpaper"
+
+        # Get wallpaper file name
         name = os.path.basename(status["colorscheme"]["path"])
+
+        # Remove file extension from name
         if "." in name:
             name = ''.join(name.split(".")[:-1])
-        status["colorscheme"]["name"] = name
-    else:
-        status["colorscheme"]["type"] = "colorscheme"
-        status["colorscheme"]["name"] = cs_name
 
+        # Set colorscheme name as wallpaper file name
+        status["colorscheme"]["name"] = name
+    
+    else:
+        # Set colorscheme type as colorscheme
+        status["colorscheme"]["type"] = "colorscheme"
+
+        # Set colorscheme name
+        status["colorscheme"]["name"] = cs_name
+    
+    # Save status file
     json.dump(status, open(path, "w"), indent=4)
