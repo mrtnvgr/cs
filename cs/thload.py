@@ -28,9 +28,18 @@ def load(theme_name):
         # Reload all templates
         reload.reload_all()
         
-        # Set wallpaper
+        # Check if wallpaper in theme
         if "wallpaper" in theme:
-            wallpaper.set(os.path.join(theme_path, theme["wallpaper"]))
+
+            # Overwrite path with absolute one
+            theme["wallpaper"] = os.path.join(theme_path, theme["wallpaper"])
+
+            # Save status file
+            status_path = os.path.join(util.paths["cache"], "status.json")
+            json.dump(theme, open(status_path, "w"), indent=4)
+            
+            # Set wallpaper
+            wallpaper.set(theme["wallpaper"])
 
     else:
         logger.error(f"{theme_name} does not exist")

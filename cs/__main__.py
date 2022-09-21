@@ -46,6 +46,19 @@ class Main:
             path = os.path.join(util.paths["cache"], "status.json")
             print(cs_status.get(path, self.args["name"]))
             exit(0)
+        elif self.args["cmd"] in ("generate", "gen"):
+            logger.info("Generating colors from wallpaper...")
+            
+            # Check if name arg is not specified
+            if self.args["name"]==None:
+                status_path = os.path.join(util.paths["cache"], "status.json")
+                
+                # Overwrite name arg with wallpaper path from status
+                self.args["name"] = cs_status.get(status_path, "wallpaper")
+
+            self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
+            self.scheme.generate()
+            self.scheme.currentScheme(name=False)
         else:
             if self.args["name"]!=None:
                 if self.args["cmd"]=="set":
@@ -64,12 +77,6 @@ class Main:
                         self.scheme.get()
                         self.scheme.set()
                         self.scheme.currentScheme()
-
-                elif self.args["cmd"] in ("generate", "gen"):
-                    logger.info("Generating colors from wallpaper...")
-                    self.scheme = colorscheme.Colorscheme(self.args["name"], self.args["light"])
-                    self.scheme.generate()
-                    self.scheme.currentScheme(name=False)
                 elif self.args["cmd"] in ("import","imp"):
                     imp = importer.Importer()
                     self.scheme = imp.importColorscheme(self.args["name"])
@@ -135,7 +142,7 @@ class Main:
         print("    Modes:")
         print("        set {name} - set colorscheme/wallpaper/wallpaper url")
         print("        del (delete) {name} - delete colorscheme/theme")
-        print("        gen (generate) {path} - generate colorscheme from wallpaper")
+        print("        gen (generate) '' (current wallpaper) or {path} - generate colorscheme from wallpaper")
         print("        imp (import) {path} - import colorscheme from other formats")
         print("        save {theme name} - save theme")
         print("        load {theme name} - load theme")
