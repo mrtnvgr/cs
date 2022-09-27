@@ -6,13 +6,14 @@ import tempfile
 import shutil
 import os
 
+
 def set(path):
-    """ Set wallpaper """
-    
+    """Set wallpaper"""
+
     # If path is url, download file
     isurl = util.isUrl(path)
     if isurl:
-        
+
         logger.info("Downloading wallpaper...")
 
         # Get content from url
@@ -38,14 +39,21 @@ def set(path):
         if os.environ.get("DISPLAY"):
 
             if shutil.which("feh"):
-                
+
                 util.run(["feh", "--bg-fill", path])
                 current(path, isurl)
-            
+                return True
+
             else:
                 logger.warning(f"Your wallpaper manager is not supported")
 
+    else:
+
+        logger.error("Wallpaper does not exist")
+
+
 def current(path, isurl):
-    """ Print current wallpaper info """
+    """Print current wallpaper info"""
     name = os.path.basename(path)
-    if not isurl: logger.info(f"Current wallpaper is {name}")
+    if not isurl:
+        logger.info(f"Current wallpaper is {name}")
