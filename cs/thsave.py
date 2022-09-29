@@ -9,23 +9,20 @@ def save(name):
     # If status exists
     if os.path.exists(status_path):
         theme_path = os.path.join(util.paths["themes"], name)
-        
+
         # Ask user to overwrite if theme already exists
         if os.path.exists(theme_path):
             logger.warning(f"Theme {name} already exists")
             ch = logger.warning("Overwrite? (y/n): ", func=input).lower()
 
-            if ch == "y":
-                # Remove old theme folder
-                shutil.rmtree(theme_path)
-            else:
+            if ch != "y":
                 exit(1)
 
         # Load status
         status = json.load(open(status_path))
         
         # Make theme directory
-        os.makedirs(theme_path)
+        os.makedirs(theme_path, exist_ok=True)
 
         # Copying files
         cache_files = os.listdir(util.paths["cache"])
