@@ -6,6 +6,7 @@ from cs import wallpaper
 from cs import util
 import json, os
 
+
 class Colorscheme:
     def __init__(self, name, light):
         self.name = name
@@ -23,17 +24,18 @@ class Colorscheme:
         logger.error(f"Unknown colorscheme: {self.name}")
         exit(1)
 
-    def set(self, wallpaper=False):
+    def set(self, cs_type="colorscheme"):
         self.getFullColorScheme()
         self.generateTemplates()
-        status.gen(cs_name=self.name, light=self.light,
-                   cs_path=self.path, wallpaper=wallpaper)
+        status.gen(
+            cs_name=self.name, light=self.light, cs_path=self.path, cs_type=cs_type
+        )
         reload.reload_all()
 
     def generate(self):
         self.scheme = generator.gen(self.name, light=self.light)
         wallpaper.set(self.name)
-        self.set(wallpaper=True)
+        self.set(cs_type="wallpaper")
 
     def getFullColorScheme(self):
         for color in self.scheme.copy():
@@ -50,10 +52,11 @@ class Colorscheme:
                 open(os.path.join(util.paths["cache"], file), "w").write(template)
 
     def currentScheme(self, name=True):
-        logger.info("Current colorscheme: ", func_args={"end": ''})
-        if name: print(f"{util.beautify(self.name)}")
+        logger.info("Current colorscheme: ", func_args={"end": ""})
+        if name:
+            print(f"{util.beautify(self.name)}")
         self.colorPalette()
-    
+
     @staticmethod
     def colorPalette():
         for i in range(0, 16):
@@ -61,5 +64,5 @@ class Colorscheme:
                 print()
             if i > 7:
                 i = "8;5;%s" % i
-            print("\033[4%sm%s\033[0m" % (i, " "*4), end="")
+            print("\033[4%sm%s\033[0m" % (i, " " * 4), end="")
         print("\n")
