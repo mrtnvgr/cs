@@ -40,18 +40,21 @@ def save(name):
         wallpaper_name = os.path.basename(status["wallpaper"])
         theme_wallpaper_path = os.path.join(theme_path, wallpaper_name)
 
-        # Check if file is url
-        if util.isUrl(status["wallpaper"]):
+        # Check that the files are not the same
+        if status["wallpaper"] != theme_wallpaper_path:
+
+            # Check if file is url
+            if util.isUrl(status["wallpaper"]):
+                
+                logger.info("Downloading wallpaper...")
+
+                # Download file
+                util.downloadUrl(status["wallpaper"], theme_wallpaper_path)
             
-            logger.info("Downloading wallpaper...")
+            else:
 
-            # Download file
-            util.downloadUrl(status["wallpaper"], theme_wallpaper_path)
-        
-        else:
-
-            # Copy wallpaper to theme folder
-            shutil.copy2(status["wallpaper"], theme_wallpaper_path)
+                # Copy wallpaper to theme folder
+                shutil.copy2(status["wallpaper"], theme_wallpaper_path)
         
         # Change wallpaper value
         status["wallpaper"] = wallpaper_name
