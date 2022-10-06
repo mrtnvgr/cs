@@ -153,10 +153,10 @@ class Main:
     def help(self):
         print("cs {mode} {name}")
         print("    Modes:")
-        print("        set {name} - set colorscheme/wallpaper/wallpaper url")
+        print("        set {name} - set colorscheme/wallpaper path/wallpaper url")
         print("        del (delete) {name} - delete colorscheme/theme")
         print(
-            "        gen (generate) '' (current wallpaper) or {path} - generate colorscheme from wallpaper"
+            "        gen (generate) '' (current wallpaper) or {path/wallpaper url} - generate colorscheme from wallpaper"
         )
         print("        imp (import) {path} - import colorscheme from other formats")
         print("        save {theme name} - save theme")
