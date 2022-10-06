@@ -1,3 +1,4 @@
+from cs import colorscheme
 from cs import wallpaper
 from cs import reload
 from cs import logger
@@ -28,6 +29,12 @@ def load(theme_name):
 
         # Reload all templates
         reload.reload_all()
+
+        # Print current color pallette
+        scheme = colorscheme.Colorscheme(
+            name=theme["colorscheme"]["name"], light=theme["colorscheme"]["light"]
+        )
+        scheme.currentScheme()
 
         # Check if wallpaper in theme
         if "wallpaper" in theme:
