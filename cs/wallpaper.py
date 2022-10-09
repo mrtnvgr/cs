@@ -2,7 +2,6 @@ from cs import util
 from cs import logger
 
 import requests
-import tempfile
 import shutil
 import os
 
@@ -23,14 +22,10 @@ def set(path):
         if "image" in file.headers["Content-Type"]:
 
             # Create temp file
-            tp = tempfile.NamedTemporaryFile(prefix="cswp-")
-
-            # Overwrite path to temp file path
-            path = tp.file.name
+            path = os.path.join(util.paths["cache"], os.path.basename(path))
 
             # Write content to temp file
-            tp.seek(0)
-            tp.write(file.content)
+            open(path, "wb").write(file.content)
 
     # Check if path exists
     if os.path.exists(path):
