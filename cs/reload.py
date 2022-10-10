@@ -4,8 +4,9 @@ from cs import util
 from cs import logger
 import yaml
 
+
 def reload_all():
-    """ Reload all """
+    """Reload all"""
     logger.info("Reloading colors...")
 
     # Reload functions
@@ -16,8 +17,9 @@ def reload_all():
     reload_qtile()
     reload_qutebrowser()
 
+
 def reload_termux():
-    """ Reload termux colors """
+    """Reload termux colors"""
 
     # Get termux config path
     termux_path = os.path.join(util.paths["home"], ".termux")
@@ -34,8 +36,9 @@ def reload_termux():
         # Run termux reload settings cmd
         util.run(["termux-reload-settings"])
 
+
 def reload_xrdb():
-    """ Merge user and cs xresources files """
+    """Merge user and cs xresources files"""
 
     # Get xresources template path
     generated = os.path.join(util.paths["cache"], "colors.Xresources")
@@ -61,8 +64,9 @@ def reload_xrdb():
                     # Merge file to xrdb db
                     util.run(["xrdb", "-merge", "-quiet", file])
 
+
 def reload_tty():
-    """ Reload tty colors """
+    """Reload tty colors"""
 
     # Get tty template path
     path = os.path.join(util.paths["cache"], "colors-tty.sh")
@@ -71,31 +75,33 @@ def reload_tty():
     term = os.getenv("TERM")
 
     # Check if current terminal is tty (linux)
-    if term=="linux":
-        
+    if term == "linux":
+
         # Check if path exists
         if os.path.exists(path):
 
             # Execute tty template
             util.run(["sh", path])
 
+
 def reload_qtile():
-    """ Reload qtile colors """
+    """Reload qtile colors"""
 
     # Check if qtile is installed
     if shutil.which("qtile"):
-        
+
         # Check if qtile is running
         if util.pidof("qtile"):
-            
+
             # Set system process kill utility
             kill_util = "pkill" if shutil.which("pkill") else "killall"
-            
+
             # Set USER1 signal (config reload request) to qtile process
             util.run([kill_util, "-SIGUSR1", "qtile"])
 
+
 def reload_qutebrowser():
-    """ Reload qutebrowser colors """
+    """Reload qutebrowser colors"""
 
     # Check if qutebrowser is installed
     if shutil.which("qutebrowser"):
@@ -104,17 +110,21 @@ def reload_qutebrowser():
         template_path = os.path.join(util.paths["cache"], "colors-qutebrowser.yml")
 
         # Get qutebrowser autoconfig path
-        qutebrowser_path = os.path.join(util.paths["home"], ".config",
-                                        "qutebrowser", "autoconfig.yml")
+        qutebrowser_path = os.path.join(
+            util.paths["home"], ".config", "qutebrowser", "autoconfig.yml"
+        )
 
         # Check if template and autoconfig exists
-        if os.path.exists(template_path) and os.path.exists(qutebrowser_path):
+        if os.path.exists(template_path):
 
             # Load colors from template
             colors = yaml.safe_load(open(template_path))
 
             # Load autoconfig settings
-            autoconfig = yaml.safe_load(open(qutebrowser_path))
+            if os.path.exists(qutebrowser_path):
+                autoconfig = yaml.safe_load(open(qutebrowser_path))
+            else:
+                autoconfig = {}
 
             # Iterate through template colora
             for color in colors:
@@ -124,7 +134,7 @@ def reload_qutebrowser():
 
             # Save merged autoconfig settings
             yaml.safe_dump(autoconfig, open(qutebrowser_path, "w"))
-            
+
             # Check if qutebrowser is running
             if util.pidof("qutebrowser"):
 
