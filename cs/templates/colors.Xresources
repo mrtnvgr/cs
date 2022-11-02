@@ -38,3 +38,7 @@
 
 *.color66: {color0}
 *color66:  {color0}
+
+slock.init: {color0}
+slock.input: {color4}
+slock.failed: {color1}
