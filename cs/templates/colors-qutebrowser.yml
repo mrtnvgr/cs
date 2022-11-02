@@ -88,6 +88,6 @@ colors.prompts.bg: "{background}"
 colors.prompts.border: "{background}"
 colors.prompts.selected.bg: "{color3}"
 
-colors.webpage.bg: "{foreground}"
+colors.webpage.bg: "{background}"
 
 hints.border: "1px solid {foreground}"

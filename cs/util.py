@@ -27,7 +27,7 @@ def disown(cmd):
 
 def pidof(name):
     try:
-        subprocess.check_output(["pidof", "-s", "-x", name])
+        subprocess.check_output(["pidof", "-x", name])
     except subprocess.CalledProcessError:
         return False
     return True
