@@ -1,4 +1,4 @@
-import subprocess, requests, os
+import subprocess, requests, shutil, os
 
 # Generate paths dict
 paths = {}
@@ -31,6 +31,15 @@ def pidof(name):
     except subprocess.CalledProcessError:
         return False
     return True
+
+def sigsend(process, signal):
+    """Send signal to process"""
+
+    # Set system process kill utility
+    kill_util = "pkill" if shutil.which("pkill") else "killall"
+
+    # Send USER1 signal (config reload request) to qtile processes
+    run([kill_util, f"-{signal}", process])
 
 
 def setupPaths():

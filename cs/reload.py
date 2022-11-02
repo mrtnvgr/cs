@@ -14,6 +14,7 @@ def reload_all():
     reload_xrdb()
     reload_tty()
     sequences.send()
+    reload_st()
     reload_qtile()
     reload_qutebrowser()
 
@@ -83,6 +84,18 @@ def reload_tty():
             # Execute tty template
             util.run(["sh", path])
 
+def reload_st():
+    """Reload st colors"""
+    # NOTE: xresources-with-reload-signal patch required
+
+    # Check if st is installed
+    if shutil.which("st"):
+
+        # Check if st is running
+        if util.pidof("st"):
+                
+            # Send USER1 signal (xresources reload request) to st processes
+            util.sigsend("st", "SIGUSR1")
 
 def reload_qtile():
     """Reload qtile colors"""
@@ -93,11 +106,8 @@ def reload_qtile():
         # Check if qtile is running
         if util.pidof("qtile"):
 
-            # Set system process kill utility
-            kill_util = "pkill" if shutil.which("pkill") else "killall"
-
-            # Set USER1 signal (config reload request) to qtile process
-            util.run([kill_util, "-SIGUSR1", "qtile"])
+            # Send USER1 signal (config reload request) to qtile processes
+            util.sigsend("qtile", "SIGUSR1")
 
 
 def reload_qutebrowser():
