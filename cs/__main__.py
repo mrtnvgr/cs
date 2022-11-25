@@ -76,7 +76,7 @@ class Main:
                             )
                             if os.path.exists(status_path):
                                 status = json.load(open(status_path))
-                                status["wallpaper"] = self.args["name"]
+                                status["wallpaper"] = os.path.abspath(self.args["name"])
                                 json.dump(status, open(status_path, "w"), indent=4)
                     else:
                         self.scheme = colorscheme.Colorscheme(

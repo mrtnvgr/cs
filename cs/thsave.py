@@ -62,7 +62,10 @@ def save(name):
             else:
 
                 # Copy wallpaper to theme folder
-                shutil.copy2(status["wallpaper"], theme_wallpaper_path)
+                try:
+                    shutil.copy2(status["wallpaper"], theme_wallpaper_path)
+                except FileNotFoundError:
+                    logger.warning("Cached wallpaper does not exist!")
 
         # Change wallpaper value
         status["wallpaper"] = wallpaper_name
